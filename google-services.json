@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1001863756026",
+    "project_id": "almacen-isastur",
+    "storage_bucket": "almacen-isastur.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001863756026:android:dc312ce3d4e0f2ac72f143",
+        "android_client_info": {
+          "package_name": "com.victor.isasturalmacen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUohUrlbGzrbSyT3D-wIkWDhhvjt6cBr8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
