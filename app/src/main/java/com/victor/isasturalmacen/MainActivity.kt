@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.victor.isasturalmacen.auxs.Connectivity
+import com.victor.isasturalmacen.navigation.NavigationWrapper
 import com.victor.isasturalmacen.ui.theme.IsasturAlmacenTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,7 +22,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-          
+
+            val context = baseContext
+            Connectivity(context).activateConnectivity()
+            NavigationWrapper()
         }
     }
 }

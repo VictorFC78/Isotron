@@ -7,4 +7,5 @@
     <string name="error_login">ERROR DE LOGIN</string>
     <string name="rev_con">Revise la conexion</string>
     <string name="sin_con">SIN CONEXION</string>
+    <string name="alta">Nuevo usuario</string>
 </resources>

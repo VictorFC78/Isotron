@@ -25,34 +25,34 @@ fun DefaultBottomBarApp(navigateToBack:()->Unit,
                         onClickChangePassword:()->Unit={}, enableChangePassword:Boolean=true,
                         navigateToDeleteUser:()->Unit={}, enableDeleteUser:Boolean=false,
                         navigateToLogin:()->Unit) {
-    BottomAppBar(containerColor = Color.LightGray,
+    BottomAppBar(containerColor = Color.White,
         actions ={
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                 IconButton(onClick = {navigateToBack()}) {
-                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "")
+                    Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "", tint = Color(0xFF2196F3))
                 }
                 if(enableToHome){
                     IconButton(onClick = {navigateToHome()}) {
-                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_home_24), contentDescription = "")
+                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_home_24), contentDescription = "",tint = Color(0xFF2196F3))
                     }
                 }
                 if(enableManageAccount){
                     IconButton(onClick = {navigateToManageAccount()}) {
-                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_manage_accounts_24), contentDescription = "")
+                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_manage_accounts_24), contentDescription = "",tint = Color(0xFF2196F3))
                     }
                 }
                 if(enableDeleteUser){
                     IconButton(onClick = {navigateToDeleteUser()}) {
-                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_person_remove_24), contentDescription = "")
+                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_person_remove_24), contentDescription = "",tint = Color(0xFF2196F3))
                     }
                 }
                 if(enableChangePassword){
                     IconButton(onClick = {onClickChangePassword()}) {
-                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_lock_reset_24), contentDescription = "")
+                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_lock_reset_24), contentDescription = "",tint = Color(0xFF2196F3))
                     }
                 }
                 IconButton(onClick = {navigateToLogin()}) {
-                    Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_logout_24), contentDescription = "")
+                    Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_logout_24), contentDescription = "",tint = Color(0xFF2196F3))
                 }
             }
         } )

@@ -1,22 +1,16 @@
 package com.victor.isotronalmacen.data
 
 
-import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.snapshots
 import com.google.firebase.firestore.toObject
-import com.google.firebase.firestore.toObjects
 import com.victor.isasturalmacen.data.ActualUser
+import com.victor.isasturalmacen.data.Constants
 import com.victor.isasturalmacen.domain.User
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
-    private  val COLLECTION_USER = "users"
+
     private val HERRAMIENTAS ="HERRAMIENTAS"
     private val TOOLINPUTS_OUTPUTS ="TOOLINPUTS_OUTPUTS"
     private val DELETETOOLS ="DELETETOOLS"
@@ -33,12 +27,12 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
     }
     //recupera un usuario por su email
     suspend fun getDataUserByEmail(email: String): User? {
-        return db.collection(COLLECTION_USER).document(email).get().await().toObject<User>()
+        return db.collection(Constants.USERS).document(email).get().await().toObject<User>()
     }
     //borra un usuario por su id
     suspend fun deleteUserByCollection(id:String): Boolean {
         return try {
-            db.collection(COLLECTION_USER).document(id).delete().await()
+            db.collection(Constants.USERS).document(id).delete().await()
             true
         }catch (e:Exception){
             false
@@ -47,7 +41,7 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
     }
     //añade los datos personales de un usuario recien registrado
     suspend fun updateFieldsUserWithEmail(id: String, user:User): Boolean {
-        return db.collection(COLLECTION_USER).document(id).set(user).isSuccessful
+        return db.collection(Constants.USERS).document(id).set(user).isSuccessful
 
 
     }

@@ -28,10 +28,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -43,9 +46,6 @@ import com.victor.isasturalmacen.viewModels.authentication.LoginViewModel
 import com.victor.isotronalmacen.components.DefaultCircularProgressBar
 import com.victor.isotronalmacen.components.DefaultTextField
 
-
-
-@SuppressLint("ResourceAsColor")
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(),
                 navigateToHome:()->Unit,
@@ -54,21 +54,20 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(),
     val uiState by viewModel.uiState.collectAsState()
 
     Box(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.Black),
-        contentAlignment = Alignment.TopStart){
+        .fillMaxSize(),
+        contentAlignment = Alignment.CenterStart){
+        Image(painter = painterResource(R.drawable.lineas), contentDescription = "",
+            contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(), alpha = 0.75f)
         Image(painter = painterResource(R.drawable.logo_isotron), contentDescription = "",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 100.dp, start = 20.dp, end = 20.dp))
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp))
 
         Column(modifier = Modifier.fillMaxSize()) {
             Spacer(modifier = Modifier.weight(1f))
             Card(modifier = Modifier
                 .fillMaxWidth()
-                .height(340.dp)
+                .height(340.dp).alpha(0.75f)
                 , shape =  RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp) ,
-                colors =CardDefaults.cardColors(containerColor = Color(0xFF6B6868))
+                colors =CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Column(modifier = Modifier
                     .fillMaxSize()
@@ -92,16 +91,17 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(),
                         .height(60.dp)
                         .padding(top = 10.dp), enabled = uiState.enable
                         , shape = RectangleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(R.color.azul_iso))) {
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))) {
                         Text("LOGIN", fontSize = 26.sp)
                     }
-                    Text(text= stringResource(R.string.registrarse),
-                        fontSize = 16.sp,
+                    Text(text= stringResource(R.string.alta),
+                        fontSize = 18.sp,
                        modifier = Modifier
                            .fillMaxSize()
                            .padding(top = 20.dp)
                            .clickable { navigateToAddUser() },
-                        color = Color(R.color.orange), textAlign = TextAlign.Center)
+                        color = Color(0xFFFF9800), textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold)
                 }
 
             }
