@@ -5,6 +5,7 @@ plugins {
     id("com.google.gms.google-services")
     //Add Serilization
     kotlin("plugin.serialization") version "2.1.0"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
     //Dagger Hilt
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
@@ -86,6 +87,8 @@ dependencies {
     //Dagger Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(kotlin("reflect"))
     //firebase
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")

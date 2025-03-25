@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">isastur almacen</string>
+    <string name="aceptar">ACEPTAR</string>
+    <string name="error">ERROR</string>
+    <string name="rev_email_contr">Revise email/contraseña</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="error_login">ERROR DE LOGIN</string>
+    <string name="rev_con">Revise la conexion</string>
+    <string name="sin_con">SIN CONEXION</string>
 </resources>
