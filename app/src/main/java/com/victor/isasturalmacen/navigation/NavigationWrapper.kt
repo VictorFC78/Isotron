@@ -6,8 +6,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.victor.isasturalmacen.screens.authentication.AddUserScreen
+import com.victor.isasturalmacen.screens.authentication.DeleteUserScreen
 import com.victor.isasturalmacen.screens.authentication.HomeScreen
 import com.victor.isasturalmacen.screens.authentication.LoginScreen
+import com.victor.isasturalmacen.screens.authentication.ManageAccountScreen
 import com.victor.isasturalmacen.viewModels.authentication.Destination
 import com.victor.isasturalmacen.viewModels.authentication.LoginViewModel
 
@@ -32,10 +34,27 @@ fun NavigationWrapper(loginViewModel:LoginViewModel= hiltViewModel()) {
             }
         }
         composable<HomeScreen> {
-            HomeScreen(navigateToBack = {},
-                navigateToManageAccount = {},
+            HomeScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
                 navigateToTools = {},
                 navigateToProducts = {}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<ManageAccountScreen> {
+            ManageAccountScreen(navigationToBack = {navHostController.popBackStack()},
+                navigateToDeleteUser = {navHostController.navigate(DeleteUserScreen)},
+                navigationToLogin = { navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }}){
+                navHostController.navigate(HomeScreen)
+            }
+        }
+        composable<DeleteUserScreen> {
+            DeleteUserScreen(navigateToToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)}) {
                 navHostController.navigate(LoginScreen) {
                     popUpTo<LoginScreen>() { inclusive = true }
                 }

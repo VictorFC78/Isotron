@@ -54,7 +54,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(),
     val uiState by viewModel.uiState.collectAsState()
 
     Box(modifier = Modifier
-        .fillMaxSize(),
+        .fillMaxSize().background(Color.Black),
         contentAlignment = Alignment.CenterStart){
         Image(painter = painterResource(R.drawable.lineas), contentDescription = "",
             contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(), alpha = 0.75f)

@@ -69,7 +69,7 @@ fun AddUserScreen(viewModel: AddUserViewModel = hiltViewModel(),
 
         ) {paddingValues ->
 
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues )
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues ).background(Color.Black)
             .background(Color.Black), contentAlignment = Alignment.TopStart){
             if(uiState.showToast){
                 DefaultToast(uiState.messageToast)

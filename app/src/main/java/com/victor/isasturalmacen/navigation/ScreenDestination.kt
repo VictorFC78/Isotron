@@ -8,3 +8,8 @@ import kotlinx.serialization.Serializable
     object NewUserScreen
     @Serializable
     object HomeScreen
+    @Serializable
+    object ManageAccountScreen
+    @Serializable
+    object DeleteUserScreen
+
