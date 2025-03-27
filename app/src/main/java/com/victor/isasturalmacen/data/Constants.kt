@@ -8,4 +8,7 @@ object Constants {
      val NEW_PRODUCTS = "NEWPRODUCTS"
      val DELETE_PRODUCTS = "DELETEPRODUCTS"
      val NEWTOOLS = "NEWTOOLS"
+     val TOOL_DIRECTORY="/Tools"
+     val INPUT_OUTPUT_DIRECTORY="/Tools In_Outputs"
+     val DELETE_TOOL_DIRECTORY = "/Tools Delete"
 }

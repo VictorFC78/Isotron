@@ -12,4 +12,8 @@ import kotlinx.serialization.Serializable
     object ManageAccountScreen
     @Serializable
     object DeleteUserScreen
+    @Serializable
+    object ProductScreen
+    @Serializable
+    object ToolScreen
 
