@@ -16,4 +16,6 @@ import kotlinx.serialization.Serializable
     object ProductScreen
     @Serializable
     object ToolScreen
+    @Serializable
+    object AddNewTool
 

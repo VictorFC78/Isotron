@@ -5,17 +5,22 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,7 +33,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -37,10 +44,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.victor.isasturalmacen.R
 import com.victor.isasturalmacen.domain.Tool
+import com.victor.isasturalmacen.viewModels.tools.ToolFlowUiState
 import com.victor.isasturalmacen.viewModels.tools.ToolFlowViewModel
 import com.victor.isotronalmacen.components.DefaultBottomBarApp
 import com.victor.isotronalmacen.components.DefaultsTopAppBar
@@ -57,7 +66,7 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
 
 
     val uiState by viewModel.uiState.collectAsState()
-    val actualUser = uiState.userCredentianls.equals("admin")
+    val actualUser = uiState.userCredentianls.equals("usuario")
 
     Scaffold(topBar = {
         DefaultsTopAppBar(enableButtons = actualUser, navigateToAddItem ={ navigateToAddTool()},
@@ -70,14 +79,14 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
             }
         }) { paddingValues ->
         Box(modifier= Modifier.fillMaxSize().padding(paddingValues)
-            .background(Color.Black)){
+            .background(Color.Black), contentAlignment = Alignment.Center){
             Image(painter = painterResource(R.drawable.lineas), contentDescription = "",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(), alpha = 0.75f)
             Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
                 LazyColumn (modifier = Modifier.fillMaxWidth()){
-                    items(uiState.listOfTools){
-                      ItemTool(tool = it, takeoutAndReturnTool = { tool,inOut->viewModel.takeOutAndReturnTool(tool,inOut) },
-                          deleteTool = { dt->viewModel.deleteTool(dt)})
+                    items(uiState.listOfTools){ tool ->
+                        ItemTool(tool = tool, takeoutAndReturnTool = { tools,inOut->viewModel.takeOutAndReturnTool(tools,inOut) },
+                          deleteTool = { viewModel.showDeleteDialog(it)})
 
                     }
                 }
@@ -87,6 +96,9 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
             DialogInfoDownLoad(uiState.showDownLoadInfoDialog, downLoadAllTools = {viewModel.downloadAllTools()},
                 downLoadInputs = {viewModel.downloadAllRegisterInputsOutputTools()},
                 downLoadOutputs = {viewModel.downloadAllRegisterDeleteTolls()}, hideDialog = {viewModel.hideDialog()})
+            DialogDeleteTool(toolFlow = uiState, show=uiState.showDeleteDialog,
+                hideDialog = {viewModel.hideDialog() })
+            {viewModel.deleteTool()}
         }
     }
 
@@ -98,57 +110,51 @@ fun DialogInfoDownLoad(show:Boolean,
                        downLoadInputs:()->Unit,
                        hideDialog:()->Unit) {
     if (show) {
-        Dialog(onDismissRequest = { hideDialog() }) {
+        Dialog(onDismissRequest = { }) {
+
             Card(
-                modifier = Modifier.size(width = 360.dp, height = 220.dp),
+                modifier = Modifier.size(width = 460.dp, height = 230.dp).alpha(0.75f),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.DarkGray
+                    containerColor = Color.White
                 )
             ) {
-                Text(
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(horizontal = 10.dp, vertical = 10.dp),
-                    text = "DESGARGAR ARCHIVOS",
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Column(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize()){
+                    Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+                        Text(text = "DESGARGAR ARCHIVOS", textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold, color = Color.Black,
+                            modifier = Modifier.padding(start = 20.dp))
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(onClick = {hideDialog()}) {
+                            Icon(Icons.Default.Close, contentDescription = "")
+                        }
+                    }
                     OutlinedButton(
                         onClick = { downLoadAllTools() }, modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 10.dp, vertical = 10.dp),
+                            .padding(horizontal = 10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color(
-                                0xFF2196F3
-                            )
                         )
                     ) {
-                        Text("LISTADO HERRAMIENTAS", color = Color.White)
+                        Text("LISTADO HERRAMIENTAS", color = Color.Black)
                     }
                     OutlinedButton(
                         onClick = { downLoadInputs() }, modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 10.dp),
+                            .padding(horizontal = 10.dp, vertical = 10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color(
-                                0xFF2196F3
-                            )
+
                         )
                     ) {
-                        Text("LISTADO ENTRADAS HERRAMIENTAS", color = Color.White)
+                        Text("LISTADO ENTRADAS HERRAMIENTAS", color = Color.Black)
                     }
                     OutlinedButton(
                         onClick = { downLoadOutputs() }, modifier = Modifier.fillMaxWidth()
-                            .padding(horizontal = 10.dp, vertical = 10.dp),
+                            .padding(horizontal = 10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color(
-                                0xFF2196F3
-                            )
+
                         )
                     ) {
-                        Text("LISTADO HERRAMIENTAS ELIMINADAS", color = Color.White)
+                        Text("LISTADO HERRAMIENTAS ELIMINADAS", color = Color.Black)
                     }
                 }
-
 
             }
         }
@@ -161,7 +167,7 @@ fun DialogInfoDownLoad(show:Boolean,
 
         val picture = when {
             tool.id!!.contains(other = "taladro", ignoreCase = true) -> R.drawable.taladro
-            tool.id.contains(other = "amoladora", ignoreCase = true) -> R.drawable.amoladora
+            tool.id.contains(other = "Radial", ignoreCase = true) -> R.drawable.amoladora
             tool.id.contains(other = "grupo", ignoreCase = true) -> R.drawable.gsoldar
             tool.id.contains(other = "CORTADORA", ignoreCase = true) -> R.drawable.cortadora
             tool.id.contains(other = "Atornillador", ignoreCase = true) -> R.drawable.atronillador
@@ -170,38 +176,41 @@ fun DialogInfoDownLoad(show:Boolean,
             }
         }
         val inStore = if (tool.inStore == true) "SI" else "NO"
-        Row(modifier = Modifier.fillMaxWidth().height(120.dp)) {
+        Row(modifier = Modifier.fillMaxWidth().height(120.dp).padding(vertical = 10.dp)
+            .background(Color.LightGray).alpha(0.55f)) {
             Image(
                 painter = painterResource(picture),
                 contentDescription = "",
                 modifier = Modifier.padding(5.dp)
             )
-            Column() {
-                Text(text = "ID:${tool.id}")
-                Text(text = "TIPO:${tool.description}")
-                Row() {
+            Column(modifier = Modifier.fillMaxHeight()) {
+                Text(text = "${tool.id}", modifier = Modifier.padding(10.dp), fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp)
+                Text(text = "${tool.description}", modifier = Modifier.padding(5.dp), fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp)
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Spacer(modifier = Modifier.weight(1f))
                     if (tool.inStore == true) {
-                        Text(text = "SACAR")
+                        Text(text = "SACAR", fontWeight = FontWeight.Bold)
                         IconButton(onClick = { takeoutAndReturnTool(tool,false) }) {
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.baseline_logout_24),
-                                contentDescription = "", tint = Color(0xFF2196F3)
+                                contentDescription = "", tint = Color.Black
                             )
                         }
                     } else {
-                        Text(text = "DEVOLVER")
+                        Text(text = "DEVOLVER", fontWeight = FontWeight.Bold)
                         IconButton(onClick = { takeoutAndReturnTool(tool,true) }) {
                             Icon(
                                 imageVector = ImageVector.vectorResource(R.drawable.baseline_logout_24),
-                                contentDescription = "", tint = Color(0xFF2196F3)
+                                contentDescription = "", tint = Color.Black
                             )
                         }
                     }
                     IconButton(onClick = { deleteTool(tool) }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(R.drawable.baseline_delete_24),
-                            contentDescription = "", tint = Color(0xFF2196F3)
+                            contentDescription = "", tint = Color.Black
                         )
 
                     }
@@ -210,4 +219,23 @@ fun DialogInfoDownLoad(show:Boolean,
         }
 
     }
+@Composable
+fun DialogDeleteTool(toolFlow:ToolFlowUiState,show:Boolean,hideDialog:()->Unit,
+                     deleteTool:()->Unit){
+    if(show){
+        Card(modifier = Modifier.width(300.dp).height(180.dp),colors=CardDefaults.cardColors(Color.White)){
+            Column (modifier = Modifier.fillMaxSize().padding(10.dp)){
+                Text(text = "¿Esta seguro de borrar\n la herramienta:${toolFlow.toolSelected.id}?", modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center, fontSize = 16.sp)
+                OutlinedButton(onClick = {deleteTool()}, modifier =Modifier.fillMaxWidth().padding(10.dp) ) {
+                    Text("ACEPTAR", color = Color.Black)
+                }
+                OutlinedButton(onClick = {hideDialog()}, modifier =Modifier.fillMaxWidth()
+                    .padding(bottom = 10.dp, start = 10.dp,end=10.dp) ) {
+                    Text("CANCELAR", color = Color.Black)
+                }
+            }
+        }
+    }
 
+}

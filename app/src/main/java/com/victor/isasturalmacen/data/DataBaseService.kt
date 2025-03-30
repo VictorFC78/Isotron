@@ -20,7 +20,6 @@ import com.victor.isasturalmacen.domain.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.tasks.await
-import org.checkerframework.checker.units.qual.C
 import javax.inject.Inject
 
 class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
@@ -64,8 +63,8 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
         return db.collection(Constants.TOOLINPUTS_OUTPUTS).get().await().toObjects<ToolLog>()
     }
     //recupera los registros de herramientas borradas
-    suspend fun getAllToolDeleteRegister(): List<DeleteRegisterTool> {
-        return db.collection(Constants.DELETETOOLS).get().await().toObjects<DeleteRegisterTool>()
+    suspend fun getAllToolDeleteRegister(): List<DeleteToolLog> {
+        return db.collection(Constants.DELETETOOLS).get().await().toObjects<DeleteToolLog>()
     }
 
     //recuperar una herramienta por id
@@ -117,7 +116,7 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
     }
     //añade un registrp de borrado de herramienta
    @RequiresApi(Build.VERSION_CODES.O)
-    suspend fun addDeleteToolRegister(tool: Tool){
+    suspend fun addDeleteToolRegister(tool: DeleteToolLog){
         db.collection(Constants.DELETETOOLS).add(createDeleteToolLog(tool)).await()
     }
     //añade una herramienta a la base de datos
@@ -129,10 +128,10 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
     //añade un registro de borrado de herramienta
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun createDeleteToolLog(tool: Tool): DeleteToolLog {
+    private fun createDeleteToolLog(tool: DeleteToolLog): DeleteToolLog {
         val date = actualDateTime()
-        return DeleteToolLog(user = ActualUser.getActualUser().name!!, idTool = tool.id!!, chargeDay = tool.chargeDay!!,
-            dischargeDay = date, description = tool.description!!, pricePerDay = tool.pricePerDay!!)
+        return DeleteToolLog(user = ActualUser.getActualUser().name!!, idTool = tool.idTool, chargeDay = tool.chargeDay,
+            dischargeDay = date, description = tool.description, pricePerDay = tool.pricePerDay)
     }
 /*
 

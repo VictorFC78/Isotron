@@ -73,9 +73,10 @@ fun ProductsScreen(viewModel: ProductsViewModel = hiltViewModel(), navigateToWir
                viewModel.logout(context =context) {navigateToLogin()}
         }
     }){ paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(paddingValues).background(Color.DarkGray),
+        Box(modifier = Modifier.fillMaxSize().padding(paddingValues).background(Color.Black),
             contentAlignment = Alignment.Center){
-
+            Image(painter = painterResource(R.drawable.lineas), contentDescription = "",
+                contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(), alpha = 0.75f)
             Column(modifier = Modifier.fillMaxSize().padding(vertical = 20.dp), verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally) {
                 ListItem(paint = R.drawable.cable, text = "CABLES"){
@@ -105,7 +106,7 @@ fun ListItem(paint:Int,text:String,navigateTo:()->Unit){
     clickable { navigateTo() }, contentAlignment = Alignment.Center){
         Image(painter = painterResource(paint) , contentDescription = "",
             modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp), contentScale = ContentScale.FillWidth,
-            alpha = 0.45f)
+            alpha = 0.75f)
         Text(text = text, fontSize = 22.sp, color = Color.White, fontWeight = FontWeight.Bold)
     }
 }

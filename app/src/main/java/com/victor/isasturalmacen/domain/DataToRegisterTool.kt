@@ -17,8 +17,14 @@ class DataToRegisterTool (private val tool: Tool) {
             idTool = tool.id!!, date= date, description = tool.description!!)
     }
 
+
+
 }
 data class DeleteRegisterTool(val user:String="",
                               val idTool:String="",
                               val date:String="",
-                              val description:String="")
+                              val description:String=""){
+    override fun toString(): String {
+        return "${date};${description};${idTool};${user}"
+    }
+}

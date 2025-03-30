@@ -13,6 +13,7 @@ import com.victor.isasturalmacen.screens.authentication.DeleteUserScreen
 import com.victor.isasturalmacen.screens.authentication.HomeScreen
 import com.victor.isasturalmacen.screens.authentication.LoginScreen
 import com.victor.isasturalmacen.screens.authentication.ManageAccountScreen
+import com.victor.isasturalmacen.screens.tools.AddNewToolScreen
 import com.victor.isasturalmacen.screens.tools.ToolsScreen
 import com.victor.isasturalmacen.viewModels.authentication.Destination
 import com.victor.isasturalmacen.viewModels.authentication.LoginViewModel
@@ -41,7 +42,7 @@ fun NavigationWrapper(loginViewModel:LoginViewModel= hiltViewModel()) {
         composable<HomeScreen> {
             HomeScreen(navigateToBack = {navHostController.popBackStack()},
                 navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
-                navigateToTools = {},
+                navigateToTools = {navHostController.navigate(ToolScreen)},
                 navigateToProducts = {navHostController.navigate(ProductScreen)}) {
                 navHostController.navigate(LoginScreen) {
                     popUpTo<LoginScreen>() { inclusive = true }
@@ -82,7 +83,16 @@ fun NavigationWrapper(loginViewModel:LoginViewModel= hiltViewModel()) {
         composable<ToolScreen> {
             ToolsScreen(navigateToBack = {navHostController.popBackStack()},
                 navigateToHome = {navHostController.navigate(HomeScreen)},
-                navigateToAddTool = {},
+                navigateToAddTool = {navHostController.navigate(AddNewTool)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<AddNewTool>{
+            AddNewToolScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
                 navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)}) {
                 navHostController.navigate(LoginScreen) {
                     popUpTo<LoginScreen>() { inclusive = true }

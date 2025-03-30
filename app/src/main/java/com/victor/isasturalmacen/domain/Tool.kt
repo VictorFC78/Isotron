@@ -12,7 +12,7 @@ data class Tool(
     val imageUrl:String?=""){
 
     override fun toString(): String {
-        return "${chargeDay};${description};${dischargeDay};${id};${imageUrl};${inStore};${pricePerDay};"
+        return "${chargeDay};${description};5${id};${inStore};${pricePerDay};"
 
     }
 }

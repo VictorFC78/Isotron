@@ -10,8 +10,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victor.isasturalmacen.MainActivity
 import com.victor.isasturalmacen.auxs.Connectivity
+import com.victor.isasturalmacen.auxs.actualDateTime
 import com.victor.isasturalmacen.data.ActualUser
 import com.victor.isasturalmacen.data.Constants
+import com.victor.isasturalmacen.domain.DeleteToolLog
 import com.victor.isasturalmacen.domain.Tool
 import com.victor.isotronalmacen.data.AuthService
 import com.victor.isotronalmacen.data.DataBaseService
@@ -39,15 +41,16 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
     val uiState : StateFlow<ToolFlowUiState> = _uiState
 
     init {
-       getAllTools()
-    }
-    private fun getAllTools(){
         viewModelScope.launch {
+            getAllTools()
+        }
+
+    }
+    private suspend fun getAllTools(){
             db.getAllToolsFlow().collect{ tools->
                 _uiState.update {
                     it.copy(listOfTools = tools, userName= ActualUser.getActualUser().name!!,
                         userCredentianls = ActualUser.getActualUser().credentials!!)
-                }
             }
         }
     }
@@ -74,7 +77,7 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
     //oculta los dialogos
     fun hideDialog() {
         _uiState.update {
-            it.copy(connectivityOk = false, showDownLoadInfoDialog = false)
+            it.copy(connectivityOk = false, showDownLoadInfoDialog = false, showDeleteDialog = false)
         }
     }
 //muestra dialogo
@@ -131,32 +134,35 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
             val deferred = withContext(Dispatchers.IO){
                 async {
                     if (file != null) {
-                        writeFile(db.getAllToolDeleteRegister(), createBufferedWriter(file))
+                        exit=writeFile(db.getAllToolDeleteRegister(), createBufferedWriter(file))
                     }
                 }
             }
             deferred.await()
-            showToast(exit,Connectivity.getContext())
+            //showToast(exit,Connectivity.getContext())
             hideDialog()
         }
     }
 // escribe datos en un csv
     private fun <T> writeFile(list:List<T>,buffer:BufferedWriter): Boolean {
+
             return try {
-                list[0]!!::class
-                    .java.declaredFields
-                    .map { it.name }
-                    .forEach {
-                        buffer.write("${it};")
-                    }
-                buffer.newLine()
-                list.forEach {
-                    buffer.write(it.toString())
+                if(list.isNotEmpty()){
+                    list[0]!!::class
+                        .java.declaredFields
+                        .map { it.name }
+                        .forEach {
+                            buffer.write("${it};")
+                        }
                     buffer.newLine()
-                }
-                buffer.flush()
-                buffer.close()
-                true
+                    list.forEach {
+                        buffer.write(it.toString())
+                        buffer.newLine()
+                    }
+                    buffer.flush()
+                    buffer.close()
+                    true
+                }else false
             }catch (e:IOException){
                 false
             }
@@ -199,11 +205,7 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
                         }
                     }
                     result.await()
-                    db.getAllToolsFlow().collect{ tools->
-                        _uiState.update {
-                            it.copy(listOfTools = tools)
-                        }
-                    }
+                    getAllTools()
                 }
             }catch (e:Exception){
                 //mostramoe un error por pantalla
@@ -215,23 +217,48 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
         }
 
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
-    fun takeOutTool(tool: Tool) {
-
+    fun deleteTool() {
+        if(Connectivity.connectOk()==true){
+            try {
+                viewModelScope.launch {
+                    val result = withContext(Dispatchers.IO){
+                        async {
+                            db.deleteTool(_uiState.value.toolSelected.id!!)
+                            db.addDeleteToolRegister(DeleteToolLog(user = _uiState.value.userName,
+                                idTool = _uiState.value.toolSelected.id!!, chargeDay = _uiState.value.toolSelected.chargeDay!!,
+                                dischargeDay = actualDateTime(), description = _uiState.value.toolSelected.description!!,
+                                pricePerDay = _uiState.value.toolSelected.pricePerDay!!)
+                            )
+                        }
+                    }
+                    result.await()
+                    hideDialog()
+                getAllTools()
+                }
+            }catch (e:Exception){
+                //mostramos un alerta por pantalla
+            }
+        }else{
+            _uiState.update {
+                it.copy(connectivityOk = true)
+            }
+        }
     }
 
-
-    fun deleteTool(dt: Tool) {
-
+    fun showDeleteDialog(tool:Tool) {
+        _uiState.update { it.copy(toolSelected = tool, showDeleteDialog = true) }
     }
-
 
 
 }
+
 data class ToolFlowUiState(
     val listOfTools: List<Tool> = emptyList(),
     val connectivityOk:Boolean=false,
     val showDownLoadInfoDialog:Boolean=false,
     val userName: String ="",
-    val userCredentianls:String=""
-)
+    val userCredentianls:String="",
+    val showDeleteDialog:Boolean=false,
+    val toolSelected:Tool=Tool())

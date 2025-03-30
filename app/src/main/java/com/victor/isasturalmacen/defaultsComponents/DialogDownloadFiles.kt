@@ -32,11 +32,12 @@ fun DialogDownloadFiles(show:Boolean,
                         kindOfProduct: String=""){
 
     if(show){
-        Card (modifier = Modifier.width(380.dp).height(180.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.LightGray)){
+        Card (modifier = Modifier.width(400.dp).height(190.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)){
             Column(modifier = Modifier.fillMaxSize().padding(10.dp)) {
                 Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
-                    Text(text = "DESCARGA DE ARCHIVOS", modifier = Modifier.weight(1f).padding(start = 30.dp), fontWeight = FontWeight.Bold)
+                    Text(text = "DESCARGA DE ARCHIVOS", modifier = Modifier.weight(1f).padding(start = 30.dp),
+                        fontWeight = FontWeight.Bold)
                     IconButton(onClick ={closeDialogDownloadFiles()} ) {
                         Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_close_24), contentDescription = "")
                     }
