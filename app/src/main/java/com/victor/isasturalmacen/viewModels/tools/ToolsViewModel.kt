@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victor.isasturalmacen.MainActivity
 import com.victor.isasturalmacen.auxs.Connectivity
+import com.victor.isasturalmacen.auxs.WriteFiles
 import com.victor.isasturalmacen.auxs.actualDateTime
 import com.victor.isasturalmacen.data.ActualUser
 import com.victor.isasturalmacen.data.Constants
@@ -37,7 +38,7 @@ import javax.inject.Inject
 class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,private val authService: AuthService):ViewModel() {
 
     
-    private val _uiState = MutableStateFlow<ToolFlowUiState>(ToolFlowUiState())
+    private val _uiState = MutableStateFlow(ToolFlowUiState())
     val uiState : StateFlow<ToolFlowUiState> = _uiState
 
     init {
@@ -68,16 +69,15 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
                 navigateToLogin()
             }
         }else{
-            _uiState.update {
-                it.copy(connectivityOk = true)
-            }
+            showDialogConnectivity()
         }
 
     }
     //oculta los dialogos
     fun hideDialog() {
         _uiState.update {
-            it.copy(connectivityOk = false, showDownLoadInfoDialog = false, showDeleteDialog = false)
+            it.copy(connectivityOk = false, showDownLoadInfoDialog = false,
+                showDeleteDialog = false)
         }
     }
 //muestra dialogo
@@ -86,111 +86,92 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
             it.copy(showDownLoadInfoDialog = true)
         }
     }
+
 //genera un archivo csv con todas las herramientas
     @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.O)
     fun downloadAllTools() {
+        if(Connectivity.connectOk()==true){
+            viewModelScope.launch{
+                var ok =false
+                val deferred = withContext(Dispatchers.IO){
+                    async {
+                        val file:File? = WriteFiles.createNewFileInDirectory(Constants.TOOL_DIRECTORY)
+                        if(file!=null){
+                            ok =WriteFiles.writeDataInFile(file,_uiState.value.listOfTools)
+                        }
+                    }
+                }
+                deferred.await()
+                if(ok){
+                    Toast.makeText(Connectivity.getContext(),"Se ha descargado el archivo",Toast.LENGTH_LONG).show()
+                }else{
+                    Toast.makeText(Connectivity.getContext(),"Se ha producido un error",Toast.LENGTH_LONG).show()
 
-           val file =createFile(Constants.TOOL_DIRECTORY)
-           viewModelScope.launch{
-               var exit = false
-               val deferred = withContext(Dispatchers.IO){
-                   async {
-                       if(file!=null){
-                            exit = writeFile(_uiState.value.listOfTools,createBufferedWriter(file))
-                       }
-                   }
-               }
-              deferred.await()
-               showToast(exit,Connectivity.getContext())
-               hideDialog()
-           }
+                }
+                hideDialog()
+            }
+        }else{
+            hideDialog()
+            showDialogConnectivity()
+        }
+
 
     }
 //genera un archivo con los movimientos de las herramientas
     @RequiresApi(Build.VERSION_CODES.O)
     fun downloadAllRegisterInputsOutputTools(){
-            val file =createFile(Constants.INPUT_OUTPUT_DIRECTORY)
+        if(Connectivity.connectOk()==true){
             viewModelScope.launch{
-                var exit =false
+                var ok =false
                 val deferred = withContext(Dispatchers.IO){
                     async {
+                        val file:File? =WriteFiles.createNewFileInDirectory(Constants.INPUT_OUTPUT_DIRECTORY)
                         if (file != null) {
-                            exit= writeFile(db.getAllRegisterInputAndOutputsTools(), createBufferedWriter(file))
+                            val list = db.getAllRegisterInputAndOutputsTools()
+                            ok = WriteFiles.writeDataInFile(file,list)
                         }
                     }
                 }
                 deferred.await()
-                showToast(exit,Connectivity.getContext())
+                if(ok)Toast.makeText(Connectivity.getContext(),"Se ha descargado el archivo",Toast.LENGTH_LONG).show()
+                else Toast.makeText(Connectivity.getContext(),"Se ha producido un error",Toast.LENGTH_LONG).show()
                 hideDialog()
             }
+        }else{
+            hideDialog()
+            showDialogConnectivity()
+        }
+
     }
     //genera un archivo de todas la herramientas que se hayan borrado
     @RequiresApi(Build.VERSION_CODES.O)
     fun downloadAllRegisterDeleteTolls(){
-        val file =createFile(Constants.DELETE_TOOL_DIRECTORY)
-        viewModelScope.launch(Dispatchers.IO) {
-            var exit = false
-            val deferred = withContext(Dispatchers.IO){
-                async {
-                    if (file != null) {
-                        exit=writeFile(db.getAllToolDeleteRegister(), createBufferedWriter(file))
+        if(Connectivity.connectOk()==true){
+            viewModelScope.launch{
+                var ok = false
+                val deferred = withContext(Dispatchers.IO){
+                    async {
+                        val file:File? =WriteFiles.createNewFileInDirectory(Constants.DELETE_TOOL_DIRECTORY)
+                        if (file != null) {
+                            val list =db.getAllToolDeleteRegister()
+                            ok = WriteFiles.writeDataInFile(file,list)
+                        }
                     }
                 }
+                deferred.await()
+                if(ok)Toast.makeText(Connectivity.getContext(),"Se ha descargado el archivo",Toast.LENGTH_LONG).show()
+                else Toast.makeText(Connectivity.getContext(),"Se ha producido un error",Toast.LENGTH_LONG).show()
+                hideDialog()
             }
-            deferred.await()
-            //showToast(exit,Connectivity.getContext())
+        }else{
             hideDialog()
-        }
-    }
-// escribe datos en un csv
-    private fun <T> writeFile(list:List<T>,buffer:BufferedWriter): Boolean {
-
-            return try {
-                if(list.isNotEmpty()){
-                    list[0]!!::class
-                        .java.declaredFields
-                        .map { it.name }
-                        .forEach {
-                            buffer.write("${it};")
-                        }
-                    buffer.newLine()
-                    list.forEach {
-                        buffer.write(it.toString())
-                        buffer.newLine()
-                    }
-                    buffer.flush()
-                    buffer.close()
-                    true
-                }else false
-            }catch (e:IOException){
-                false
-            }
-
-    }
-
-    //genera un directorio y archivo para guardar datos
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createFile(directory:String,): File? {
-        return try {
-            val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val newDir = File(path,directory)
-            if(!newDir.exists()) newDir.mkdirs()
-            File(newDir,LocalDate.now().toString())
-        }catch (e:FileNotFoundException){
-            null
+            showDialogConnectivity()
         }
 
     }
-    private fun createBufferedWriter(file:File): BufferedWriter {
-        return FileOutputStream(file).bufferedWriter()
-    }
-    private fun showToast(ok:Boolean,context: Context){
-        return when{
-            ok->Toast.makeText(context,"Archivo descargado",Toast.LENGTH_LONG).show()
-            else->Toast.makeText(context,"Se ha producido un error",Toast.LENGTH_LONG).show()
-        }
-    }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     fun takeOutAndReturnTool(tool: Tool, inOut: Boolean) {
         if(Connectivity.connectOk()==true){
@@ -208,12 +189,10 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
                     getAllTools()
                 }
             }catch (e:Exception){
-                //mostramoe un error por pantalla
+               showDialogError()
             }
         }else{
-            _uiState.update {
-                it.copy(connectivityOk = true)
-            }
+            showDialogConnectivity()
         }
 
     }
@@ -235,15 +214,13 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
                     }
                     result.await()
                     hideDialog()
-                getAllTools()
+                    getAllTools()
                 }
             }catch (e:Exception){
-                //mostramos un alerta por pantalla
+                showDialogError()
             }
         }else{
-            _uiState.update {
-                it.copy(connectivityOk = true)
-            }
+            showDialogConnectivity()
         }
     }
 
@@ -251,6 +228,16 @@ class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,priva
         _uiState.update { it.copy(toolSelected = tool, showDeleteDialog = true) }
     }
 
+    private fun showDialogConnectivity(){
+        _uiState.update {
+            it.copy(connectivityOk = true, messageAlert = "Prohibida acción, 'Sin Conexion'", tipoAlert = "SIN CONEXION")
+    }
+}
+    private fun showDialogError(){
+        _uiState.update {
+            it.copy(connectivityOk = true, messageAlert = "Se ha producido un error", tipoAlert = "ERROR")
+        }
+    }
 
 }
 
@@ -261,4 +248,6 @@ data class ToolFlowUiState(
     val userName: String ="",
     val userCredentianls:String="",
     val showDeleteDialog:Boolean=false,
-    val toolSelected:Tool=Tool())
+    val toolSelected:Tool=Tool(),
+    val messageAlert:String="",
+    val tipoAlert:String="")

@@ -44,14 +44,7 @@ fun DefaultsTopAppBar(
             ) {
                 Text(text=title, modifier = Modifier.padding(10.dp), fontSize = 22.sp)
                     Spacer(modifier = Modifier.weight(1f))
-                if(enableUpFile){
-                    IconButton(onClick = { onClickUpFile() }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.baseline_file_upload_24),
-                            contentDescription = ""
-                        )
-                    }
-                }
+
                 if (enableButtons) {
                     IconButton(onClick = { navigateToAddItem() }) {
                         Icon(

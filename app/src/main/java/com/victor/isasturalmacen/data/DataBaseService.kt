@@ -14,6 +14,7 @@ import com.victor.isasturalmacen.data.Constants
 import com.victor.isasturalmacen.domain.DataToRegisterTool
 import com.victor.isasturalmacen.domain.DeleteRegisterTool
 import com.victor.isasturalmacen.domain.DeleteToolLog
+import com.victor.isasturalmacen.domain.KindOfTool
 import com.victor.isasturalmacen.domain.Tool
 import com.victor.isasturalmacen.domain.ToolLog
 import com.victor.isasturalmacen.domain.User
@@ -75,13 +76,13 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
             .mapNotNull {qs->qs.toObject(Tool::class.java)  }
     }
     //recupera todas la herramientas
-   /*suspend fun getAllTools(): List<Tool> {
+   suspend fun getAllTools(): List<Tool> {
            return try {
-               db.collection(HERRAMIENTAS).get().await().toObjects<Tool>()
+               db.collection(Constants.TOOLS).get().await().toObjects<Tool>()
            } catch (e:Exception){
                listOf()
            }
-    }*/
+    }
     // actualiza el estado de almacen de una herramienta
     @SuppressLint("SuspiciousIndentation")
     suspend fun updateDateTool(id: String?, value:Boolean?){
@@ -133,8 +134,18 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
         return DeleteToolLog(user = ActualUser.getActualUser().name!!, idTool = tool.idTool, chargeDay = tool.chargeDay,
             dischargeDay = date, description = tool.description, pricePerDay = tool.pricePerDay)
     }
-/*
+    //recupera la lista de clases de herramienta que hay
+    suspend fun getListKindOfTools(): List<KindOfTool> {
+        return db.collection(Constants.KIND_TOOLS).get().await().documents.mapNotNull {
+            snp->snp.toObject(KindOfTool::class.java)
+        }
+    }
+    //añade un nuevo tipo de herramienta a la lista
+    suspend fun addNewKindOfTool(kindOfTool: KindOfTool){
+        db.collection(Constants.KIND_TOOLS).add(kindOfTool).await()
+    }
 
+/*
     //añade un registro de nuevo cable
     suspend fun addCreateRegisterNewProduct(registerNewAdd:RegisterNewProduct){
         db.collection(NEW_PRODUCTS).add(registerNewAdd).await()

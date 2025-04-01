@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.victor.isasturalmacen.auxs.Connectivity
 import com.victor.isasturalmacen.auxs.actualDateTime
 import com.victor.isasturalmacen.data.ActualUser
+import com.victor.isasturalmacen.data.Constants
+import com.victor.isasturalmacen.domain.KindOfTool
 import com.victor.isasturalmacen.domain.Tool
 import com.victor.isotronalmacen.data.AuthService
 import com.victor.isotronalmacen.data.DataBaseService
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.checkerframework.checker.units.qual.C
 import java.util.Locale
 import javax.inject.Inject
 
@@ -27,19 +30,61 @@ class AddToolViewModel @Inject constructor(private val db:DataBaseService,privat
 
     private val _uiState = MutableStateFlow(AddToolUiState())
     val uiState :StateFlow<AddToolUiState> = _uiState
-
+init {
+    getListOfKindTools()
+}
+    private fun getListOfKindTools(){
+        viewModelScope.launch {
+            val result = withContext(Dispatchers.IO){
+                async {
+                    db.getListKindOfTools()
+                }
+            }
+            val list =result.await().let { lst->
+                lst.map { enlist->enlist.kind }
+            }
+            _uiState.update { it.copy(listOfKidOfTools = list) }
+        }
+    }
 
     fun hideDialogs(){
         _uiState.update {
             it.copy(showHelpDialog = false, showExitDialog = false,
                 showErrorDialog = false, showConnectivityOk = false, showMenu = false,
-                userName = ActualUser.getActualUser().name!!)
+                userName = ActualUser.getActualUser().name!!, showMenuNewKindOfTool = false)
         }
     }
     fun onChangedValues(description:String,pricePerDay:String){
         _uiState.update {
             it.copy(description = description,pricePerDay=pricePerDay)
         }
+    }
+    fun addNewKindOfTool(){
+        if(Connectivity.connectOk()==true){
+            viewModelScope.launch {
+                if(_uiState.value.listOfKidOfTools.none {
+                        it == _uiState.value.newKindOfTool.uppercase()
+                    }){
+                    val result = withContext(Dispatchers.IO){
+                        async {
+                            db.addNewKindOfTool(KindOfTool(_uiState.value.newKindOfTool.uppercase()))
+                        }
+                    }
+                    result.await()
+                    getListOfKindTools()
+                    hideDialogs()
+                    Toast.makeText(Connectivity.getContext(),"Se ha añadido a la lista",Toast.LENGTH_LONG).show()
+                }else{
+                    Toast.makeText(Connectivity.getContext(),"Ya esta en la lista",Toast.LENGTH_LONG).show()
+                }
+            }
+        }else{
+            _uiState.update { it.copy(showConnectivityOk = true) }
+        }
+    }
+
+    fun onChangedValueNewKinOfTool(kindOfTool:String){
+        _uiState.update { it.copy(newKindOfTool =kindOfTool ) }
     }
     private fun checkValuesAreCorrect(): Boolean {
         return _uiState.value.kindOfToolSelected.isNotBlank()
@@ -59,22 +104,23 @@ class AddToolViewModel @Inject constructor(private val db:DataBaseService,privat
                         val tool =getProvisionalTool()
                         val resul= withContext(Dispatchers.IO){
                             async {
-                                db.addNewTool(tool)
+                                existTool(tool)
                             }
                         }
-                        resul.isCompleted.let {
-                            _uiState.update { it.copy(showExitDialog = true) }
+                        if(resul.await()){
+                            db.addNewTool(tool)
+                            Toast.makeText(Connectivity.getContext(),"Se ha añadido la herramienta",Toast.LENGTH_LONG).show()
                             deleteData()
+                        }else{
+                            Toast.makeText(Connectivity.getContext(),"La herramienta ya existe",Toast.LENGTH_LONG).show()
                         }
                     }
                 }catch (e:Exception){
-                    _uiState.update { it.copy(showErrorDialog = true) }
+
                     deleteData()
                 }
             }else{
-                _uiState.update {
-                    it.copy(showHelpDialog = true)
-                }
+                Toast.makeText(Connectivity.getContext(),"Se ha producido un error",Toast.LENGTH_LONG).show()
             }
         }else{
             _uiState.update {
@@ -82,6 +128,10 @@ class AddToolViewModel @Inject constructor(private val db:DataBaseService,privat
             }
             deleteData()
         }
+
+    }
+    private suspend fun existTool(tool:Tool):Boolean{
+        return db.getAllTools().none { it->it.id == tool.id }
 
     }
     private fun deleteData(){
@@ -118,7 +168,9 @@ class AddToolViewModel @Inject constructor(private val db:DataBaseService,privat
             }
         }
     }
-
+    fun showMenuNewKindOfTool()  {
+        _uiState.update { it.copy(showMenuNewKindOfTool = true) }
+    }
     fun showMenu(){
         _uiState.update { it.copy(showMenu = true) }
     }
@@ -137,4 +189,8 @@ data class AddToolUiState (
     val showErrorDialog:Boolean=false,
     val showConnectivityOk:Boolean=false,
     val showMenu:Boolean=false,
-    val userName:String="")
+    val showMenuNewKindOfTool:Boolean=false,
+    val userName:String="",
+    val newKindOfTool:String="",
+    val listOfKidOfTools:List<String> = listOf()
+)

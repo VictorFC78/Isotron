@@ -5,6 +5,9 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,8 +17,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -25,6 +31,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -48,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.victor.isasturalmacen.R
+import com.victor.isasturalmacen.viewModels.tools.AddToolUiState
 import com.victor.isasturalmacen.viewModels.tools.AddToolViewModel
 import com.victor.isotronalmacen.components.DefaultBottomBarApp
 import com.victor.isotronalmacen.components.DefaultTextField
@@ -74,7 +82,8 @@ fun AddNewToolScreen(viewModel: AddToolViewModel = hiltViewModel(),
                                 enableChangePassword = false) { navigateToLogout() }
         }) { paddingValues ->
         Box (modifier = Modifier.fillMaxSize().padding(paddingValues).background(Color.Black),
-            contentAlignment = Alignment.TopEnd,){
+            contentAlignment = Alignment.TopCenter
+        ){
             Image(painter = painterResource(R.drawable.lineas), contentDescription = "",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(), alpha = 0.75f)
             Image(painter = painterResource(R.drawable.logo_isotron), contentDescription = "",
@@ -82,16 +91,19 @@ fun AddNewToolScreen(viewModel: AddToolViewModel = hiltViewModel(),
            DialogIdTool (show = uiState.showHelpDialog){
                viewModel.hideDialogs()
            }
-            DialogExitNewTool(uiState.showExitDialog) {
-                viewModel.hideDialogs()
-            }
+
             DefaultDialogAlert(show = uiState.showErrorDialog, onConfirmation = {viewModel.hideDialogs()},
                 onDismissRequest = {viewModel.hideDialogs()}, dialogTitle = "ERROR", dialogText = "se ha producido un error al crear la herramienta")
-            DefaultDialogAlert(show = uiState.showConnectivityOk, dialogTitle = "SIN CONEXION", dialogText = "Sin conexion no se pueden añadir herramientas",
+            DefaultDialogAlert(show = uiState.showConnectivityOk, dialogTitle = "SIN CONEXION", dialogText = "Sin conexion ,accion cancelada",
                 onConfirmation = {viewModel.hideDialogs()}, onDismissRequest = {viewModel.hideDialogs()})
+
+            MenuAddNewKingOfTool(uiState = uiState, addNewKindOfTool = {viewModel.addNewKindOfTool()},
+                onValuedChanged = {viewModel.onChangedValueNewKinOfTool(it)}) {
+                viewModel.hideDialogs()
+            }
         Column(modifier = Modifier.fillMaxSize()) {
             Spacer(modifier = Modifier.weight(1f))
-            Card (modifier = Modifier.fillMaxWidth().height(300.dp).alpha(0.75f),
+            Card (modifier = Modifier.fillMaxWidth().height(320.dp).alpha(0.75f),
                 shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White)
             ){
@@ -102,13 +114,21 @@ fun AddNewToolScreen(viewModel: AddToolViewModel = hiltViewModel(),
                     IconButton(onClick ={viewModel.showMenu()} ) {
                         Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_menu_24), contentDescription = "",
                             tint = Color.Black, modifier = Modifier.padding(end = 10.dp) )
-                        MenuTool(uiState.showMenu, hideExpand = {viewModel.hideDialogs()}) {
+                        MenuTool(list = uiState.listOfKidOfTools,expand = uiState.showMenu, hideExpand = {viewModel.hideDialogs()}) {
                             viewModel.kindOfToolSelected(it)
                         }
                     }
+                    IconButton(onClick ={viewModel.showMenuNewKindOfTool()} ) {
+                        Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_add_box_24), contentDescription = "",
+                            tint = Color.Black, modifier = Modifier.padding(end = 10.dp) )
+
+                    }
 
                 }
-
+                Text(text ="TIPO DE HERRAMIENTA:${uiState.kindOfToolSelected}" , modifier = Modifier.
+                fillMaxWidth().
+                padding(bottom = 20.dp, start = 20.dp, end = 20.dp),
+                    fontWeight = FontWeight.Black)
                 DefaultTextField(value = uiState.description,
                     onValueChange = {viewModel.onChangedValues(it,uiState.pricePerDay)}, label = "DESCRIPCION",
                     modifier = Modifier.fillMaxWidth().padding(start =20.dp, end = 20.dp, bottom = 20.dp ))
@@ -157,31 +177,14 @@ fun DialogIdTool(show:Boolean,hideDialog:()->Unit,
     }
 
 }
-@Composable
-fun DialogExitNewTool(show:Boolean,onDismissRequest:()->Unit){
 
-    if(show){
-        Dialog(onDismissRequest = {onDismissRequest()}) {
-            Card (modifier = Modifier.fillMaxWidth().height(180.dp).padding(20.dp),shape = RoundedCornerShape( 20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)){
-                Column (modifier = Modifier.fillMaxSize().padding(20.dp,40.dp), verticalArrangement = Arrangement.Center){
-                    Text(modifier = Modifier.fillMaxWidth(), text = "SE HA AÑADIDO LA HERRAMIENTA",
-                        textAlign = TextAlign.Center, color = Color.Black, fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp)
-                }
-
-            }
-        }
-    }
-}
 @Composable
-fun MenuTool(expand:Boolean,hideExpand:()->Unit,
+fun MenuTool(list:List<String>,expand:Boolean,hideExpand:()->Unit,
              kindOfToolSelected:(String)->Unit){
 
-        val toolList = listOf("TALADRO","RADIAL","GRUPO SOLDAR","CORTADORA","ATORNILLADOR")
         DropdownMenu(expanded = expand, onDismissRequest = {hideExpand()},
             modifier =Modifier.background(Color.White)) {
-            toolList.forEach { option->
+            list.forEach { option->
                 DropdownMenuItem(
                     text={ Text(text = option)},
                     onClick = {kindOfToolSelected(option)
@@ -190,4 +193,31 @@ fun MenuTool(expand:Boolean,hideExpand:()->Unit,
 
             }
         }
+}
+@Composable
+fun MenuAddNewKingOfTool(uiState:AddToolUiState,
+                         addNewKindOfTool:()->Unit,
+                         onValuedChanged:(String)->Unit,
+                         hideDialog:()->Unit){
+    if(uiState.showMenuNewKindOfTool){
+        Column(modifier = Modifier.fillMaxSize().padding(vertical = 100.dp, horizontal = 20.dp)) {
+            Card(modifier =Modifier.size(width = 400.dp, height = 250.dp).padding(),
+                colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+                    Text(text = "INSERTE TIPO DE HERRAMIENTA", modifier = Modifier.fillMaxWidth().padding(top=10.dp,bottom = 10.dp))
+                    DefaultTextField(value = uiState.newKindOfTool, onValueChange = {onValuedChanged(it)},
+                        modifier =Modifier.fillMaxWidth().padding(bottom = 10.dp) ,
+                        label = "TIPO DE HERRAMIENTA")
+                    OutlinedButton(onClick = {addNewKindOfTool()}, modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp)) {
+                        Text("ACEPTAR")
+                    }
+                    OutlinedButton(onClick = {hideDialog()}, modifier = Modifier.fillMaxWidth()) {
+                        Text("CANCELAR")
+                    }
+                }
+            }
+        }
+
+    }
+
 }

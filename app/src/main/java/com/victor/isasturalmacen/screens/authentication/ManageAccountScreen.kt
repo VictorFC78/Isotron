@@ -1,23 +1,31 @@
 package com.victor.isasturalmacen.screens.authentication
 
 import DefaultDialogAlert
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -29,14 +37,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.victor.isasturalmacen.R
 import com.victor.isasturalmacen.data.ActualUser
@@ -46,6 +57,7 @@ import com.victor.isotronalmacen.components.DefaultTextField
 import com.victor.isotronalmacen.components.DefaultToast
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel(),
@@ -55,11 +67,18 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel(),
                         navigateToHome:()->Unit){
 
     val user = ActualUser.getActualUser()
-    val uiState by viewModel.manageAccountUiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text(text = user.name!!) })
+        TopAppBar(title = { Text(text = user.name!!) }, actions = {
+            IconButton(onClick = {viewModel.showDialogDownload()}) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.baseline_file_download_24),
+                    contentDescription = ""
+                )
+            }
+        })
     }, bottomBar = {
         DefaultBottomBarApp(navigateToBack = {navigationToBack()},
                             navigateToHome = {navigateToHome()},
@@ -71,7 +90,7 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel(),
         }
     }) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues).background(Color.Black),
-            contentAlignment = Alignment.TopStart){
+            contentAlignment = Alignment.Center){
             if(uiState.showToast){
                 DefaultToast(uiState.messageToast)
                 viewModel.hideToastAndDialog()
@@ -116,10 +135,62 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel(),
             DefaultDialogAlert(show = uiState.showConnectivityOk, dialogTitle = "SIN CONEXION",
                 dialogText = "Revise la conexion,Si acepta cerrada la aplicacion",
                 onConfirmation = {viewModel.closeApp()}, onDismissRequest = {})
+            DialogInfoDownLoad(show = uiState.showDialogDownload,
+                downLoadInOutProducts = {viewModel.downloadRegisterProductsByActualUser()},
+                downLoadInOutTools = {viewModel.downloadRegisterToolsByActualUser()}) {
+                viewModel.hideToastAndDialog()
+            }
         }
     }
 
 }
+@Composable
+fun DialogInfoDownLoad(show:Boolean,
+                       downLoadInOutProducts:()->Unit,
+                       downLoadInOutTools:()->Unit,
+                       hideDialog:()->Unit) {
+    if (show) {
+        Dialog(onDismissRequest = { }) {
 
+            Card(
+                modifier = Modifier.size(width = 400.dp, height = 200.dp).alpha(0.75f),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
+                )
+            ) {
+                Column(modifier = Modifier.fillMaxSize()){
+                    Row (modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically){
+                        Text(text = "DESGARGAR ARCHIVOS", textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold, color = Color.Black,
+                            modifier = Modifier.padding(start = 20.dp))
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(onClick = {hideDialog()}) {
+                            Icon(Icons.Default.Close, contentDescription = "")
+                        }
+                    }
+                    OutlinedButton(
+                        onClick = { downLoadInOutTools() }, modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 10.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                        )
+                    ) {
+                        Text("ENTRADAS/SALIDAS HERRAMIENTAS", color = Color.Black)
+                    }
+                    OutlinedButton(
+                        onClick = { downLoadInOutProducts() }, modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 10.dp, vertical = 10.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+
+                        )
+                    ) {
+                        Text("ENTRADAS/SALIDAS PRODUCTOS", color = Color.Black)
+                    }
+
+                }
+
+            }
+        }
+    }
+}
 
 

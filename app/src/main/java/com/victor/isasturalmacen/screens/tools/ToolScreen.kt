@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.victor.isasturalmacen.R
+import com.victor.isasturalmacen.defaultsComponents.ToastDefault
 import com.victor.isasturalmacen.domain.Tool
 import com.victor.isasturalmacen.viewModels.tools.ToolFlowUiState
 import com.victor.isasturalmacen.viewModels.tools.ToolFlowViewModel
@@ -91,14 +93,16 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
                     }
                 }
             }
-            DefaultDialogAlert(show = uiState.connectivityOk, dialogText = "Si Acepta Cerrará la Aplicacion manteniendo la sesion",
-                dialogTitle = "SIN CONEXION", onDismissRequest = {viewModel.hideDialog()}, onConfirmation = {viewModel.closeApp()})
+            DefaultDialogAlert(show = uiState.connectivityOk, dialogText = uiState.messageAlert,
+                dialogTitle = uiState.tipoAlert, onDismissRequest = {viewModel.hideDialog()}, onConfirmation = {viewModel.hideDialog()})
             DialogInfoDownLoad(uiState.showDownLoadInfoDialog, downLoadAllTools = {viewModel.downloadAllTools()},
-                downLoadInputs = {viewModel.downloadAllRegisterInputsOutputTools()},
-                downLoadOutputs = {viewModel.downloadAllRegisterDeleteTolls()}, hideDialog = {viewModel.hideDialog()})
+                downLoadDeleteTools = {viewModel.downloadAllRegisterDeleteTolls()},
+                downLoadInOutputs ={viewModel.downloadAllRegisterInputsOutputTools()}, hideDialog = {viewModel.hideDialog()})
             DialogDeleteTool(toolFlow = uiState, show=uiState.showDeleteDialog,
                 hideDialog = {viewModel.hideDialog() })
             {viewModel.deleteTool()}
+
+
         }
     }
 
@@ -106,8 +110,8 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
 @Composable
 fun DialogInfoDownLoad(show:Boolean,
                        downLoadAllTools:()->Unit,
-                       downLoadOutputs:()->Unit,
-                       downLoadInputs:()->Unit,
+                       downLoadInOutputs:()->Unit,
+                       downLoadDeleteTools:()->Unit,
                        hideDialog:()->Unit) {
     if (show) {
         Dialog(onDismissRequest = { }) {
@@ -137,16 +141,16 @@ fun DialogInfoDownLoad(show:Boolean,
                         Text("LISTADO HERRAMIENTAS", color = Color.Black)
                     }
                     OutlinedButton(
-                        onClick = { downLoadInputs() }, modifier = Modifier.fillMaxWidth()
+                        onClick = { downLoadInOutputs() }, modifier = Modifier.fillMaxWidth()
                             .padding(horizontal = 10.dp, vertical = 10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
 
                         )
                     ) {
-                        Text("LISTADO ENTRADAS HERRAMIENTAS", color = Color.Black)
+                        Text("ENTRADA/SALIDA HERRAMIENTAS", color = Color.Black)
                     }
                     OutlinedButton(
-                        onClick = { downLoadOutputs() }, modifier = Modifier.fillMaxWidth()
+                        onClick = { downLoadDeleteTools() }, modifier = Modifier.fillMaxWidth()
                             .padding(horizontal = 10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
 
@@ -171,13 +175,14 @@ fun DialogInfoDownLoad(show:Boolean,
             tool.id.contains(other = "grupo", ignoreCase = true) -> R.drawable.gsoldar
             tool.id.contains(other = "CORTADORA", ignoreCase = true) -> R.drawable.cortadora
             tool.id.contains(other = "Atornillador", ignoreCase = true) -> R.drawable.atronillador
+            tool.id.contains(other = "sierra", ignoreCase = true) -> R.drawable.atronillador
             else -> {
-                R.drawable.sierra
+                R.drawable.general_
             }
         }
         val inStore = if (tool.inStore == true) "SI" else "NO"
         Row(modifier = Modifier.fillMaxWidth().height(120.dp).padding(vertical = 10.dp)
-            .background(Color.LightGray).alpha(0.55f)) {
+            .background(Color.LightGray).alpha(0.75f)) {
             Image(
                 painter = painterResource(picture),
                 contentDescription = "",
