@@ -58,6 +58,7 @@ init {
         _uiState.update {
             it.copy(description = description,pricePerDay=pricePerDay)
         }
+        allFieldsIsFilled()
     }
     fun addNewKindOfTool(){
         if(Connectivity.connectOk()==true){
@@ -86,18 +87,17 @@ init {
     fun onChangedValueNewKinOfTool(kindOfTool:String){
         _uiState.update { it.copy(newKindOfTool =kindOfTool ) }
     }
-    private fun checkValuesAreCorrect(): Boolean {
-        return _uiState.value.kindOfToolSelected.isNotBlank()
-                && checkCorrectPrice()
-                && _uiState.value.description.isNotBlank()
-
+    private fun allFieldsIsFilled(){
+        _uiState.update { it.copy(enableButtonAdd =_uiState.value.kindOfToolSelected.isNotBlank()
+                &&_uiState.value.pricePerDay.isNotBlank()
+                && _uiState.value.description.isNotBlank() ) }
     }
 
     //añade una herramienta a la base de datos
     @RequiresApi(Build.VERSION_CODES.O)
     fun addNewTool(){
         if(Connectivity.connectOk()==true){
-            if(checkValuesAreCorrect()){
+            if(checkCorrectPrice()){
                 try {
                     viewModelScope.launch {
                         //falta comprobar si ya la herramienta ya existe hay que recuperra todoas las herramientas y comprobar si existe
@@ -120,7 +120,7 @@ init {
                     deleteData()
                 }
             }else{
-                Toast.makeText(Connectivity.getContext(),"Se ha producido un error",Toast.LENGTH_LONG).show()
+                _uiState.update { it.copy(showHelpDialog = true) }
             }
         }else{
             _uiState.update {
@@ -144,8 +144,17 @@ init {
     }
 
     private fun checkCorrectPrice(): Boolean {
-        val regex = Regex("\\d{1,2},\\d{1,2}|\\d{1,2}\\.\\d{1,2}")
-        return _uiState.value.pricePerDay.uppercase(Locale.ROOT).matches(regex)
+        return try {
+            if(_uiState.value.pricePerDay.contains('.')){
+                _uiState.value.pricePerDay.toDouble()
+                true
+            } else {
+                _uiState.value.pricePerDay.toInt()
+                true
+            }
+        }catch (e:NumberFormatException){
+            false
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -192,5 +201,6 @@ data class AddToolUiState (
     val showMenuNewKindOfTool:Boolean=false,
     val userName:String="",
     val newKindOfTool:String="",
-    val listOfKidOfTools:List<String> = listOf()
+    val listOfKidOfTools:List<String> = listOf(),
+    val enableButtonAdd:Boolean=false
 )

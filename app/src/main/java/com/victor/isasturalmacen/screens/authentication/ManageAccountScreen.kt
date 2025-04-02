@@ -91,10 +91,7 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel(),
     }) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(paddingValues).background(Color.Black),
             contentAlignment = Alignment.Center){
-            if(uiState.showToast){
-                DefaultToast(uiState.messageToast)
-                viewModel.hideToastAndDialog()
-            }
+
             Image(painter = painterResource(R.drawable.lineas), contentDescription = "",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(), alpha = 0.75f)
             Image(painter = painterResource(R.drawable.logo_isotron), contentDescription = "",
@@ -138,7 +135,7 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel(),
             DialogInfoDownLoad(show = uiState.showDialogDownload,
                 downLoadInOutProducts = {viewModel.downloadRegisterProductsByActualUser()},
                 downLoadInOutTools = {viewModel.downloadRegisterToolsByActualUser()}) {
-                viewModel.hideToastAndDialog()
+                viewModel.hideDialog()
             }
         }
     }

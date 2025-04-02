@@ -20,11 +20,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -82,6 +84,7 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
         }) { paddingValues ->
         Box(modifier= Modifier.fillMaxSize().padding(paddingValues)
             .background(Color.Black), contentAlignment = Alignment.Center){
+
             Image(painter = painterResource(R.drawable.lineas), contentDescription = "",
                 contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize(), alpha = 0.75f)
             Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
@@ -94,6 +97,14 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
                     }
                 }
             }
+            Box(modifier = Modifier.fillMaxSize().padding(10.dp), contentAlignment = Alignment.BottomStart){
+                FloatingActionButton(containerColor = Color.LightGray,
+                    onClick = {  }, modifier = Modifier.alpha(0.80f)
+                ) {
+                    Icon(Icons.Filled.Add, "Floating action button.")
+                }
+            }
+
             DefaultDialogAlert(show = uiState.connectivityOk, dialogText = uiState.messageAlert,
                 dialogTitle = uiState.tipoAlert, onDismissRequest = {viewModel.hideDialog()}, onConfirmation = {viewModel.hideDialog()})
             DialogInfoDownLoad(uiState.showDownLoadInfoDialog, downLoadAllTools = {viewModel.downloadAllTools()},

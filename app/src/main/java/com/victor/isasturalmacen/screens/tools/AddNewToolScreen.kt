@@ -138,7 +138,8 @@ fun AddNewToolScreen(viewModel: AddToolViewModel = hiltViewModel(),
                     keyboardType = KeyboardType.Number)
                 Button(onClick = {viewModel.addNewTool()}, modifier = Modifier.fillMaxWidth().height(60.dp)
                     .padding(start =20.dp, end = 20.dp, bottom = 10.dp), shape = RectangleShape,
-                    colors = ButtonDefaults.buttonColors(containerColor =  Color(0xFF0B6FBE))
+                    colors = ButtonDefaults.buttonColors(containerColor =  Color(0xFF0B6FBE)),
+                    enabled = uiState.enableButtonAdd
                     ) {
                         Text("AÑADIR HERRAMIENTA")
                 }
@@ -154,20 +155,14 @@ fun DialogIdTool(show:Boolean,hideDialog:()->Unit,
                  ){
     if(show){
         Dialog(onDismissRequest ={hideDialog()} ) {
-            Card(modifier = Modifier.width(300.dp).height(130.dp),
+            Card(modifier = Modifier.width(300.dp).height(60.dp),
                 shape = RoundedCornerShape( 20.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF8CE0DB))) {
+                colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
                 Column(modifier = Modifier.fillMaxWidth().padding(20.dp)) {
-                    Text(modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                        text = "DEBE SELECCIONAR TIPO DE HERRAMIENTA", textAlign = TextAlign.Center,
-                        color = Color.Red,fontWeight = FontWeight.Bold)
-                    Text(modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp),
-                        text = "DEBE RELLENAR TODOS LOS CAMPOS", textAlign = TextAlign.Center,
-                        color = Color.Red,fontWeight = FontWeight.Bold)
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                         Text(text = "FORMATO PRECIO:",color = Color.Black, textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold)
-                        Text(text = "00.00", color = Color.Red, textAlign = TextAlign.Center,
+                        Text(text = "45.98  -  125", color = Color.Red, textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold)
                     }
 
