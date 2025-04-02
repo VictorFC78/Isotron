@@ -13,10 +13,14 @@ import com.victor.isasturalmacen.screens.authentication.DeleteUserScreen
 import com.victor.isasturalmacen.screens.authentication.HomeScreen
 import com.victor.isasturalmacen.screens.authentication.LoginScreen
 import com.victor.isasturalmacen.screens.authentication.ManageAccountScreen
+import com.victor.isasturalmacen.screens.products.NewMagnetothermicScreen
+import com.victor.isasturalmacen.screens.products.NewWireScreen
+import com.victor.isasturalmacen.screens.products.WiresScreen
 import com.victor.isasturalmacen.screens.tools.AddNewToolScreen
 import com.victor.isasturalmacen.screens.tools.ToolsScreen
 import com.victor.isasturalmacen.viewModels.authentication.Destination
 import com.victor.isasturalmacen.viewModels.authentication.LoginViewModel
+import com.victor.isotronalmacen.screeens.products.MagnetothermicScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -67,8 +71,8 @@ fun NavigationWrapper(loginViewModel:LoginViewModel= hiltViewModel()) {
             }
         }
         composable<ProductScreen> {
-             ProductsScreen(navigateToWires = {},
-                 navigateToMagneto = {},
+             ProductsScreen(navigateToWires = {navHostController.navigate(WireScreen)},
+                 navigateToMagneto = {navHostController.navigate(MagnetothermicScreen)},
                  navigateToContactors = {},
                  navigateToPowerSupply = {},
                  navigateToCabinet = {},
@@ -94,6 +98,46 @@ fun NavigationWrapper(loginViewModel:LoginViewModel= hiltViewModel()) {
             AddNewToolScreen(navigateToBack = {navHostController.popBackStack()},
                 navigateToHome = {navHostController.navigate(HomeScreen)},
                 navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<WireScreen> {
+            WiresScreen(navigateToAddWire = {navHostController.navigate(NewWireScreen)},
+                navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<NewWireScreen> {
+            NewWireScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToWires = {navHostController.navigate(WireScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<MagnetothermicScreen> {
+            MagnetothermicScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToNewMagneto = {navHostController.navigate(NewMagnetothermicScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<NewMagnetothermicScreen> {
+            NewMagnetothermicScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToMagnetos = {navHostController.navigate(MagnetothermicScreen)}) {
                 navHostController.navigate(LoginScreen) {
                     popUpTo<LoginScreen>() { inclusive = true }
                 }

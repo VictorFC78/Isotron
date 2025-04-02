@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -28,41 +29,47 @@ import com.victor.isasturalmacen.domain.Product
 import org.checkerframework.checker.units.qual.A
 
 @Composable
-fun ProductItem(item: Product,
+fun ProductItem(deletePermission:Boolean,item: Product,
                 showDeleteDialog:(Product)->Unit,
                 onClickShowInputOutputProduct: (Product, Boolean) -> Unit){
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center){
+    Box(modifier = Modifier.fillMaxSize().alpha(0.75f), contentAlignment = Alignment.Center){
         Row(modifier = Modifier.fillMaxWidth().height(160.dp).padding(bottom = 10.dp)
-            .background(Color.DarkGray)){
+            .background(Color.LightGray)){
             Row {
                 Column {
                     Text(text = "ID: ${item.id}", modifier = Modifier
                         .padding( top = 10.dp, bottom = 10.dp, start = 20.dp, end = 20.dp),
-                        color = Color.White, fontWeight = FontWeight.Bold)
+                        color = Color.Black, fontWeight = FontWeight.Bold)
                     Text(text = "TIPO: ${item.kind}", modifier = Modifier
                         .padding( bottom = 10.dp, start = 20.dp, end = 20.dp),
-                        color = Color.White,fontWeight = FontWeight.Bold)
+                        color = Color.Black,fontWeight = FontWeight.Bold)
                     Text(text = "STOCK ACTUAL: ${item.stockActual}", modifier = Modifier
                         .padding( bottom = 10.dp, start = 20.dp, end = 20.dp),
-                        color = Color.White,fontWeight = FontWeight.Bold)
-                    Text(text = "REF.FABRICANTE: ${item.refProduct}", color = Color.White, modifier =
+                        color = Color.Black,fontWeight = FontWeight.Bold)
+                    Text(text = "REF.FABRICANTE: ${item.refProduct}", color = Color.Black, modifier =
                     Modifier.padding( start = 20.dp, end = 20.dp),fontWeight = FontWeight.Bold)
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End){
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically){
+                        Text("RECEPCIONAR", fontWeight = FontWeight.Bold)
                         IconButton(onClick = {onClickShowInputOutputProduct(item,true)}) {
                             Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_login_24), contentDescription = "",
-                                tint = Color.White)
+                                tint = Color.Black)
                         }
                         if(item.stockActual>0){
+                            Text("DESPACHAR", fontWeight = FontWeight.Bold)
                             IconButton(onClick = {onClickShowInputOutputProduct(item,false)}) {
                                 Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_logout_24), contentDescription = "",
+                                    tint = Color.Black)
+                            }
+                        }
+                        if(deletePermission){
+                            IconButton(onClick = {showDeleteDialog(item)}) {
+                                Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_delete_24), contentDescription = "",
                                     tint = Color.White)
                             }
                         }
-                        IconButton(onClick = {showDeleteDialog(item)}) {
-                            Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_delete_24), contentDescription = "",
-                                tint = Color.White)
-                        }
+
                     }
                 }
 

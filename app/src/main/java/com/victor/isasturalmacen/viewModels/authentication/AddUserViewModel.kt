@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victor.isasturalmacen.auxs.Connectivity
 import com.victor.isasturalmacen.data.ActualUser
+import com.victor.isasturalmacen.data.DataBaseService
 import com.victor.isasturalmacen.domain.User
 import com.victor.isotronalmacen.data.AuthService
-import com.victor.isotronalmacen.data.DataBaseService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -21,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddUserViewModel @Inject constructor(private val authService: AuthService
-,private val dataBaseService: DataBaseService):ViewModel(){
+,private val dataBaseService: DataBaseService
+):ViewModel(){
 
     private val _uiState = MutableStateFlow(NewUserUiState())
     val uiState : StateFlow<NewUserUiState> = _uiState

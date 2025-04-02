@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.victor.isasturalmacen.auxs.Connectivity
+import com.victor.isasturalmacen.data.DataBaseService
 import com.victor.isotronalmacen.data.AuthService
-import com.victor.isotronalmacen.data.DataBaseService
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

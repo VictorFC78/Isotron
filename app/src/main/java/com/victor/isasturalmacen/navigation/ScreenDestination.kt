@@ -18,4 +18,11 @@ import kotlinx.serialization.Serializable
     object ToolScreen
     @Serializable
     object AddNewTool
-
+    @Serializable
+    object WireScreen
+    @Serializable
+    object NewWireScreen
+    @Serializable
+    object MagnetothermicScreen
+    @Serializable
+    object NewMagnetothermicScreen

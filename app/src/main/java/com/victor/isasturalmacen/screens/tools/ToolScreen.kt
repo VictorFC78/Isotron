@@ -68,7 +68,7 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
 
 
     val uiState by viewModel.uiState.collectAsState()
-    val actualUser = uiState.userCredentianls.equals("usuario")
+    val actualUser = uiState.userCredentianls.equals("admin")
 
     Scaffold(topBar = {
         DefaultsTopAppBar(enableButtons = actualUser, navigateToAddItem ={ navigateToAddTool()},
@@ -87,7 +87,8 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
             Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
                 LazyColumn (modifier = Modifier.fillMaxWidth()){
                     items(uiState.listOfTools){ tool ->
-                        ItemTool(tool = tool, takeoutAndReturnTool = { tools,inOut->viewModel.takeOutAndReturnTool(tools,inOut) },
+                        ItemTool(tool = tool, deletePermission = actualUser,
+                            takeoutAndReturnTool = { tools,inOut->viewModel.takeOutAndReturnTool(tools,inOut) },
                           deleteTool = { viewModel.showDeleteDialog(it)})
 
                     }
@@ -166,7 +167,7 @@ fun DialogInfoDownLoad(show:Boolean,
 }
 
     @Composable
-    fun ItemTool(takeoutAndReturnTool:(Tool,Boolean)->Unit,
+    fun ItemTool(deletePermission:Boolean,takeoutAndReturnTool:(Tool,Boolean)->Unit,
                  tool: Tool,deleteTool:(Tool)->Unit) {
 
         val picture = when {
@@ -212,13 +213,16 @@ fun DialogInfoDownLoad(show:Boolean,
                             )
                         }
                     }
-                    IconButton(onClick = { deleteTool(tool) }) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.baseline_delete_24),
-                            contentDescription = "", tint = Color.Black
-                        )
+                    if(deletePermission){
+                        IconButton(onClick = { deleteTool(tool) }) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(R.drawable.baseline_delete_24),
+                                contentDescription = "", tint = Color.Black
+                            )
 
+                        }
                     }
+
                 }
             }
         }

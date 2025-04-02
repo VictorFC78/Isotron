@@ -1,4 +1,4 @@
-package com.victor.isotronalmacen.data
+package com.victor.isasturalmacen.data
 
 
 import android.annotation.SuppressLint
@@ -11,10 +11,16 @@ import com.google.firebase.firestore.toObjects
 import com.victor.isasturalmacen.auxs.actualDateTime
 import com.victor.isasturalmacen.data.ActualUser
 import com.victor.isasturalmacen.data.Constants
+import com.victor.isasturalmacen.data.Constants.DELETE_PRODUCTS
+import com.victor.isasturalmacen.data.Constants.NEW_PRODUCTS
 import com.victor.isasturalmacen.domain.DataToRegisterTool
 import com.victor.isasturalmacen.domain.DeleteRegisterTool
 import com.victor.isasturalmacen.domain.DeleteToolLog
 import com.victor.isasturalmacen.domain.KindOfTool
+import com.victor.isasturalmacen.domain.Product
+import com.victor.isasturalmacen.domain.RegisterDeleteProduct
+import com.victor.isasturalmacen.domain.RegisterNewProduct
+import com.victor.isasturalmacen.domain.RegisterStockProduct
 import com.victor.isasturalmacen.domain.Tool
 import com.victor.isasturalmacen.domain.ToolLog
 import com.victor.isasturalmacen.domain.User
@@ -145,14 +151,14 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
         db.collection(Constants.KIND_TOOLS).add(kindOfTool).await()
     }
 
-/*
+
     //añade un registro de nuevo cable
-    suspend fun addCreateRegisterNewProduct(registerNewAdd:RegisterNewProduct){
+    suspend fun addCreateRegisterNewProduct(registerNewAdd: RegisterNewProduct){
         db.collection(NEW_PRODUCTS).add(registerNewAdd).await()
     }
 
     //añade un registro al lista de borrado de productos
-    suspend fun addRegisterDeleteProduct(registerDeleteProduct:RegisterDeleteProduct) {
+    suspend fun addRegisterDeleteProduct(registerDeleteProduct: RegisterDeleteProduct) {
         db.collection(DELETE_PRODUCTS).add(registerDeleteProduct).await()
     }
 
@@ -189,5 +195,5 @@ class DataBaseService @Inject constructor(private val db:FirebaseFirestore) {
     //recupera la lista de moivimientos de producto segun coleccion
     suspend fun getListRegisterStockProducts(kindOfCollection:String): List<RegisterStockProduct> {
         return db.collection(kindOfCollection).get().await().toObjects<RegisterStockProduct>()
-    }*/
+    }
 }

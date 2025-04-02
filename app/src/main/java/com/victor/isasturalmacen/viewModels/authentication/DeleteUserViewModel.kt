@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victor.isasturalmacen.auxs.Connectivity
 import com.victor.isasturalmacen.data.ActualUser
+import com.victor.isasturalmacen.data.DataBaseService
 import com.victor.isasturalmacen.domain.User
 import com.victor.isotronalmacen.data.AuthService
-import com.victor.isotronalmacen.data.DataBaseService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +20,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class DeleteUserViewModel @Inject constructor(private val authService: AuthService,private val db:DataBaseService):ViewModel(){
+class DeleteUserViewModel @Inject constructor(private val authService: AuthService,private val db: DataBaseService):ViewModel(){
 
     private var user: User = ActualUser.getActualUser()
     private val _uiState = MutableStateFlow(DeleteUserUiState())

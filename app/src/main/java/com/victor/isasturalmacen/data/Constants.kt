@@ -12,5 +12,9 @@ object Constants {
      val INPUT_OUTPUT_DIRECTORY="/Tools In_Outputs"
      val DELETE_TOOL_DIRECTORY = "/Tools Delete"
      val KIND_TOOLS = "KIND_TOOLS"
+     val WIRES = "WIRES"
+     val WIRESINPUTS_OUTPUTS = "WIRESINPUTS_OUTPUTS"
 
+     val MAGNETOS = "MAGNETOS"
+     val MAGNETOSINPUTS_OUTPUTS = "MAGNETOSINPUTS_OUTPUTS"
 }

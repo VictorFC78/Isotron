@@ -14,10 +14,10 @@ import com.victor.isasturalmacen.auxs.WriteFiles
 import com.victor.isasturalmacen.auxs.actualDateTime
 import com.victor.isasturalmacen.data.ActualUser
 import com.victor.isasturalmacen.data.Constants
+import com.victor.isasturalmacen.data.DataBaseService
 import com.victor.isasturalmacen.domain.DeleteToolLog
 import com.victor.isasturalmacen.domain.Tool
 import com.victor.isotronalmacen.data.AuthService
-import com.victor.isotronalmacen.data.DataBaseService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -35,7 +35,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-class ToolFlowViewModel @Inject constructor(private val db:DataBaseService,private val authService: AuthService):ViewModel() {
+class ToolFlowViewModel @Inject constructor(private val db: DataBaseService, private val authService: AuthService):ViewModel() {
 
     
     private val _uiState = MutableStateFlow(ToolFlowUiState())
