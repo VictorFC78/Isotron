@@ -26,3 +26,15 @@ import kotlinx.serialization.Serializable
     object MagnetothermicScreen
     @Serializable
     object NewMagnetothermicScreen
+    @Serializable
+    object CabinetScreen
+    @Serializable
+    object NewCabinetScreen
+    @Serializable
+    object ContactorScreen
+    @Serializable
+    object NewContactorScreen
+    @Serializable
+    object PowerSupplyScreen
+    @Serializable
+    object NewPowerSupplyScreen

@@ -13,14 +13,20 @@ import com.victor.isasturalmacen.screens.authentication.DeleteUserScreen
 import com.victor.isasturalmacen.screens.authentication.HomeScreen
 import com.victor.isasturalmacen.screens.authentication.LoginScreen
 import com.victor.isasturalmacen.screens.authentication.ManageAccountScreen
+import com.victor.isasturalmacen.screens.products.CabinetScreen
+import com.victor.isasturalmacen.screens.products.NewCabinetScreen
+import com.victor.isasturalmacen.screens.products.NewContactorScreen
 import com.victor.isasturalmacen.screens.products.NewMagnetothermicScreen
+import com.victor.isasturalmacen.screens.products.NewPowerSupplyScreen
 import com.victor.isasturalmacen.screens.products.NewWireScreen
 import com.victor.isasturalmacen.screens.products.WiresScreen
 import com.victor.isasturalmacen.screens.tools.AddNewToolScreen
 import com.victor.isasturalmacen.screens.tools.ToolsScreen
 import com.victor.isasturalmacen.viewModels.authentication.Destination
 import com.victor.isasturalmacen.viewModels.authentication.LoginViewModel
+import com.victor.isotronalmacen.screeens.products.ContactorScreen
 import com.victor.isotronalmacen.screeens.products.MagnetothermicScreen
+import com.victor.isotronalmacen.screeens.products.PowerSupplyScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -73,9 +79,9 @@ fun NavigationWrapper(loginViewModel:LoginViewModel= hiltViewModel()) {
         composable<ProductScreen> {
              ProductsScreen(navigateToWires = {navHostController.navigate(WireScreen)},
                  navigateToMagneto = {navHostController.navigate(MagnetothermicScreen)},
-                 navigateToContactors = {},
-                 navigateToPowerSupply = {},
-                 navigateToCabinet = {},
+                 navigateToContactors = {navHostController.navigate(ContactorScreen)},
+                 navigateToPowerSupply = {navHostController.navigate(PowerSupplyScreen)},
+                 navigateToCabinet = {navHostController.navigate(CabinetScreen)},
                  navigateToBack = {navHostController.popBackStack()},
                  navigateToHome = {navHostController.navigate(HomeScreen)},
                  navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)}) {
@@ -138,6 +144,66 @@ fun NavigationWrapper(loginViewModel:LoginViewModel= hiltViewModel()) {
                 navigateToHome = {navHostController.navigate(HomeScreen)},
                 navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
                 navigateToMagnetos = {navHostController.navigate(MagnetothermicScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<CabinetScreen> {
+            CabinetScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToNewCabinet = {navHostController.navigate(NewCabinetScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<NewCabinetScreen> {
+            NewCabinetScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToCabinets = {navHostController.navigate(CabinetScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<ContactorScreen> {
+            ContactorScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToNewContactor = {navHostController.navigate(NewContactorScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<NewContactorScreen> {
+            NewContactorScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToContactors = {navHostController.navigate(ContactorScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<PowerSupplyScreen> {
+            PowerSupplyScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToNewPowerSupply = {navHostController.navigate(NewPowerSupplyScreen)}) {
+                navHostController.navigate(LoginScreen) {
+                    popUpTo<LoginScreen>() { inclusive = true }
+                }
+            }
+        }
+        composable<NewPowerSupplyScreen> {
+            NewPowerSupplyScreen(navigateToBack = {navHostController.popBackStack()},
+                navigateToHome = {navHostController.navigate(HomeScreen)},
+                navigateToManageAccount = {navHostController.navigate(ManageAccountScreen)},
+                navigateToPowerSupplies = {navHostController.navigate(PowerSupplyScreen)}) {
                 navHostController.navigate(LoginScreen) {
                     popUpTo<LoginScreen>() { inclusive = true }
                 }

@@ -1,6 +1,7 @@
 package com.victor.isasturalmacen.viewModels.products
 
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,10 +17,13 @@ import com.victor.isasturalmacen.domain.RegisterStockProduct
 import com.victor.isotronalmacen.data.AuthService
 
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.checkerframework.checker.units.qual.C
 import javax.inject.Inject
 
@@ -152,7 +156,9 @@ class WiresViewModel @Inject constructor(private val db: DataBaseService, privat
         }
     }
 
-
+    fun hideDialogError(){
+        _uiState.update { it.copy(showDialogError = false) }
+    }
     fun showDialogDownloadFiles(){
         _uiState.update {
             it.copy(showDialogDownloadFiles = true)
@@ -174,11 +180,21 @@ class WiresViewModel @Inject constructor(private val db: DataBaseService, privat
    @RequiresApi(Build.VERSION_CODES.O)
    fun downloadAllWires(){
        if(Connectivity.connectOk()==true){
+
            viewModelScope.launch {
-               val file =WriteFiles.createNewFileInDirectory(Constants.WIRES)
-               if(file!=null){
-                   WriteFiles.writeDataInFile(file,_uiState.value.listOfWires)
+               var ok =false
+               val deferred = withContext(Dispatchers.IO){
+                   async {
+                       val file =WriteFiles.createNewFileInDirectory(Constants.WIRES)
+                       if(file!=null){
+                          ok = WriteFiles.writeDataInFile(file,_uiState.value.listOfWires)
+                       }
+                   }
                }
+               deferred.await()
+               if (ok) showToast("Se ha descargado el archivo")
+               else showToast("Se ha producido un error")
+
            }
        }else{
           showErrorDialogConnectivity()
@@ -188,11 +204,19 @@ class WiresViewModel @Inject constructor(private val db: DataBaseService, privat
     fun downloadInputOutputWire(){
         if(Connectivity.connectOk()==true){
             viewModelScope.launch {
-                val file =WriteFiles.createNewFileInDirectory("WIRESINPUT_OUTPUT")
-                if(file!=null){
-                    val listRegister = db.getListRegisterStockProducts(Constants.WIRESINPUTS_OUTPUTS)
-                    WriteFiles.writeDataInFile(file,listRegister)
+                var ok =false
+                val deferred =withContext(Dispatchers.IO){
+                    async {
+                        val file =WriteFiles.createNewFileInDirectory(Constants.WIRESINPUTS_OUTPUTS)
+                        if(file!=null){
+                            val listRegister = db.getListRegisterStockProducts(Constants.WIRESINPUTS_OUTPUTS)
+                            ok = WriteFiles.writeDataInFile(file,listRegister)
+                        }
+                    }
                 }
+                deferred.await()
+                if (ok) showToast("Se ha descargado el archivo")
+                else showToast("Se ha producido un error")
             }
         }else{
             showErrorDialogConnectivity()
@@ -207,6 +231,9 @@ class WiresViewModel @Inject constructor(private val db: DataBaseService, privat
         _uiState.update {
             it.copy(showDialogError = true, messageError = "Revise la conectividad")
         }
+    }
+    private fun showToast(text:String){
+        Toast.makeText(Connectivity.getContext(),text, Toast.LENGTH_LONG).show()
     }
 }
 

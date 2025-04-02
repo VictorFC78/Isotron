@@ -1,4 +1,4 @@
-package com.victor.isotronalmacen.viewmodels.products
+package com.victor.isasturalmacen.viewModels.products
 
 import android.os.Build
 import android.widget.Toast
@@ -9,16 +9,13 @@ import com.victor.isasturalmacen.auxs.Connectivity
 import com.victor.isasturalmacen.auxs.WriteFiles
 import com.victor.isasturalmacen.auxs.actualDateTime
 import com.victor.isasturalmacen.data.ActualUser
-import com.victor.isasturalmacen.data.Constants
-import com.victor.isasturalmacen.data.Constants.CONTACTORSINPUTS_OUTPUTS
-import com.victor.isasturalmacen.data.Constants.MAGNETOS
-import com.victor.isasturalmacen.data.Constants.MAGNETOSINPUTS_OUTPUTS
+import com.victor.isasturalmacen.data.Constants.POWERSUPPLIES
+import com.victor.isasturalmacen.data.Constants.POWERSUPPLIESINPUTS_OUTPUTS
 import com.victor.isasturalmacen.data.DataBaseService
 import com.victor.isasturalmacen.domain.Product
 import com.victor.isasturalmacen.domain.RegisterDeleteProduct
 import com.victor.isasturalmacen.domain.RegisterStockProduct
 import com.victor.isotronalmacen.data.AuthService
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -27,33 +24,31 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-
 import javax.inject.Inject
 
 @HiltViewModel
-class MagnetothermicViewModel @Inject constructor(private val authService: AuthService, private val db: DataBaseService):ViewModel() {
+class PowerSupplyViewModel @Inject constructor(private val authService: AuthService,private val db: DataBaseService):ViewModel(){
 
 
     private val user = ActualUser.getActualUser()
-    private val _uiState = MutableStateFlow(MagnetothermicUiState())
-    val uiState : StateFlow<MagnetothermicUiState> = _uiState
+    private val _uiState = MutableStateFlow(PowerSupplyUiState())
+    val uiState : StateFlow<PowerSupplyUiState> = _uiState
 
     init {
         viewModelScope.launch {
-            db.getFlowListOfProductByCollection(MAGNETOS).collect(){
+            db.getFlowListOfProductByCollection(POWERSUPPLIES).collect(){
                     magnetos->
                 _uiState.update {
-                    it.copy(user = user.name!!, listOfMagnetothermic =magnetos,
+                    it.copy(user = user.name!!, listOfPowerSupply =magnetos ,
                         userCredentials = user.credentials!! == "admin")
                 }
             }
         }
     }
 
-
-    fun onClickInputOutputMagneto(product: Product, inOut: Boolean) {
+    fun onClickInputOutputPowerSupply(product: Product, inOut: Boolean) {
         _uiState.update {
-            it.copy(magnetothermic = product, inOut = inOut, showDialogAmount = true)
+            it.copy(powerSupply = product, inOut = inOut, showDialogAmount = true)
         }
     }
 
@@ -64,7 +59,7 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
     }
 
     private fun correctAmount(): Boolean {
-        return _uiState.value.magnetothermic.stockActual >= _uiState.value.inOutAmount.toInt()
+        return _uiState.value.powerSupply.stockActual >= _uiState.value.inOutAmount.toInt()
     }
 
     private fun correctFormatAmount():Int{
@@ -76,20 +71,20 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
             0
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun getRegisterStockContactor(): RegisterStockProduct {
+    private fun getRegisterStockPowerSupply(): RegisterStockProduct {
         return RegisterStockProduct(user = _uiState.value.user, dateIn = actualDateTime(),
-            id = _uiState.value.magnetothermic.id, refProduct = _uiState.value.magnetothermic.refProduct,
+            id = _uiState.value.powerSupply.id, refProduct = _uiState.value.powerSupply.refProduct,
             outAmount = _uiState.value.inOutAmount.toInt())
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createRegisterDeleteProduct(): RegisterDeleteProduct {
-        return RegisterDeleteProduct(id=_uiState.value.magnetothermic.id, stockActual = _uiState.value.magnetothermic.stockActual.toInt(),
-            manufacturer = _uiState.value.magnetothermic.manufacturer, refProduct = _uiState.value.magnetothermic.refProduct,
+        return RegisterDeleteProduct(id=_uiState.value.powerSupply.id, stockActual = _uiState.value.powerSupply.stockActual.toInt(),
+            manufacturer = _uiState.value.powerSupply.manufacturer, refProduct = _uiState.value.powerSupply.refProduct,
             date = actualDateTime(), user = ActualUser.getActualUser().name!!
         )
     }
-
 
     fun hideDialogAmount() {
         _uiState.update { it.copy(showDialogAmount = false) }
@@ -100,14 +95,14 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun getInputOutAmountMagnetos() {
+    fun getInputOutAmountPowerSupply() {
         if(correctFormatAmount()!=0){
             when{
                 _uiState.value.inOut->{
-                    getInputOutputScope(_uiState.value.magnetothermic.stockActual + _uiState.value.inOutAmount.toInt())
+                    getInputOutputScope(_uiState.value.powerSupply.stockActual + _uiState.value.inOutAmount.toInt())
                 }
                 !_uiState.value.inOut && correctAmount()->{
-                    getInputOutputScope(_uiState.value.magnetothermic.stockActual - _uiState.value.inOutAmount.toInt())
+                    getInputOutputScope(_uiState.value.powerSupply.stockActual - _uiState.value.inOutAmount.toInt())
                 }else->{
                 showDialogErrorFormat()
             }
@@ -121,11 +116,11 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
     private fun getInputOutputScope(amount: Int) {
         if(Connectivity.connectOk()==true){
             viewModelScope.launch {
-                db.updateStockProduct(kindOfCollection = MAGNETOS, id=_uiState.value.magnetothermic.id, amount =amount)
-                db.createRegisterStockProduct(kindOfCollection =Constants. MAGNETOSINPUTS_OUTPUTS, registerStockProduct = getRegisterStockContactor())
-                db.getFlowListOfProductByCollection(MAGNETOS).collect(){magnetos->
+                db.updateStockProduct(kindOfCollection = POWERSUPPLIES, id=_uiState.value.powerSupply.id, amount =amount)
+                db.createRegisterStockProduct(kindOfCollection = POWERSUPPLIESINPUTS_OUTPUTS, registerStockProduct = getRegisterStockPowerSupply())
+                db.getFlowListOfProductByCollection(POWERSUPPLIES).collect(){powerS->
                     _uiState.update {
-                        it.copy(listOfMagnetothermic = magnetos, showDialogAmount = false)
+                        it.copy(listOfPowerSupply = powerS, showDialogAmount = false)
                     }
                 }
             }
@@ -135,10 +130,10 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun deleteMagneto() {
+    fun deletePowerSupply() {
         if (Connectivity.connectOk()==true){
             viewModelScope.launch {
-                db.deleteproductById(kindOfCollection = MAGNETOS, id = _uiState.value.magnetothermic.id)
+                db.deleteproductById(kindOfCollection = POWERSUPPLIES, id = _uiState.value.powerSupply.id)
                 db.addRegisterDeleteProduct(createRegisterDeleteProduct())
                 hideDialogDelete()
             }
@@ -158,9 +153,9 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
                 var ok = false
                 val deferred = withContext(Dispatchers.IO){
                     async {
-                        val file = WriteFiles.createNewFileInDirectory(MAGNETOS)
+                        val file = WriteFiles.createNewFileInDirectory(POWERSUPPLIES)
                         if(file!=null){
-                            ok = WriteFiles.writeDataInFile(file,_uiState.value.listOfMagnetothermic)
+                           ok = WriteFiles.writeDataInFile(file,_uiState.value.listOfPowerSupply)
                         }
                     }
                 }
@@ -174,15 +169,15 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun downloadInputOutputMagnetos() {
+    fun downloadInputOutputPowerSupply() {
         if(Connectivity.connectOk()==true){
             viewModelScope.launch {
                 var ok = false
                 val deferred = withContext(Dispatchers.IO){
                     async {
-                        val file = WriteFiles.createNewFileInDirectory(MAGNETOSINPUTS_OUTPUTS)
+                        val file = WriteFiles.createNewFileInDirectory("CONTACTORSINPUT_OUTPUT")
                         if(file!=null){
-                            val listRegister = db.getListRegisterStockProducts(MAGNETOSINPUTS_OUTPUTS)
+                            val listRegister = db.getListRegisterStockProducts(POWERSUPPLIESINPUTS_OUTPUTS)
                             ok = WriteFiles.writeDataInFile(file,listRegister)
                         }
                     }
@@ -200,9 +195,9 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
         _uiState.update { it.copy(showDialogDownloadFiles = false) }
     }
 
-    fun onClickDeleteMagneto(item: Product) {
+    fun onClickDeletePowerSupply(item: Product) {
         _uiState.update {
-            it.copy(magnetothermic = item, showDialogDelete = true)
+            it.copy(powerSupply = item, showDialogDelete = true)
         }
     }
 
@@ -237,8 +232,8 @@ class MagnetothermicViewModel @Inject constructor(private val authService: AuthS
     }
 }
 
-data class MagnetothermicUiState(val listOfMagnetothermic:List<Product> = emptyList(),
-                                 val magnetothermic: Product = Product(),
+data class PowerSupplyUiState(val listOfPowerSupply:List<Product> = emptyList(),
+                                 val powerSupply: Product = Product(),
                                  val showDialogAmount:Boolean=false,
                                  val showDialogDelete:Boolean=false,
                                  val showDialogError:Boolean=false,
@@ -247,4 +242,4 @@ data class MagnetothermicUiState(val listOfMagnetothermic:List<Product> = emptyL
                                  val inOut:Boolean=true,
                                  val messageError:String="",
                                  val user:String="",
-                                 val userCredentials:Boolean=false)
+                                 val userCredentials:Boolean=false )

@@ -66,7 +66,7 @@ fun ProductItem(deletePermission:Boolean,item: Product,
                         if(deletePermission){
                             IconButton(onClick = {showDeleteDialog(item)}) {
                                 Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_delete_24), contentDescription = "",
-                                    tint = Color.White)
+                                    tint = Color.Black)
                             }
                         }
 

@@ -22,23 +22,28 @@ object WriteFiles {
         }
     }
     fun <T> writeDataInFile(file:File, listOfData:List<T>): Boolean {
+
         val buffer = FileOutputStream(file).bufferedWriter()
         return try {
-
-            listOfData[0]!!::class
-                .java.declaredFields
-                .map { it.name }
-                .forEach {
-                    buffer.write("${it};")
-                }
-            buffer.newLine()
-            listOfData.forEach {
-                buffer.write(it.toString())
+            if(listOfData.isNotEmpty()){
+                listOfData[0]!!::class
+                    .java.declaredFields
+                    .map { it.name }
+                    .forEach {
+                        buffer.write("${it};")
+                    }
                 buffer.newLine()
+                listOfData.forEach {
+                    buffer.write(it.toString())
+                    buffer.newLine()
+                }
+                buffer.flush()
+                buffer.close()
+                true
+            }else{
+                false
             }
-            buffer.flush()
-            buffer.close()
-            true
+
         }catch (e:IOException){
             false
         }

@@ -84,8 +84,8 @@ fun WiresScreen(viewModel: WiresViewModel = hiltViewModel(),
                     getInputOutputAmount = {viewModel.getInputOutputAmount()}) {
                     viewModel.hideDialog()
                 }
-            DefaultDialogAlert(show = uiState.showDialogError, onDismissRequest = {viewModel.hideDialog()},
-            onConfirmation = {viewModel.hideDialog()}, dialogTitle = "ERROR", dialogText = uiState.messageError)
+            DefaultDialogAlert(show = uiState.showDialogError, onDismissRequest = {viewModel.hideDialogError()},
+            onConfirmation = {viewModel.hideDialogError()}, dialogTitle = "ERROR", dialogText = uiState.messageError)
            DialogDeleteProduct(show = uiState.showDeleteDialog,
                refProduct = uiState.product.refProduct,
                confirmDelete = {viewModel.deleteWireProduct()}) {

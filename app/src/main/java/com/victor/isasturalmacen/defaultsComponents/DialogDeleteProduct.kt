@@ -12,6 +12,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -24,8 +25,8 @@ fun DialogDeleteProduct(show:Boolean,
                         confirmDelete:()->Unit,
                         cancelDelete:()->Unit){
     if(show){
-        Card(modifier = Modifier.width(320.dp).height(200.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.LightGray)){
+        Card(modifier = Modifier.width(320.dp).height(200.dp).alpha(0.85f),
+            colors = CardDefaults.cardColors(containerColor = Color.White)){
             Column(modifier = Modifier.fillMaxSize().padding(20.dp)) {
                 Text(text = "¿QUIERE BORRAR?:${refProduct}", modifier = Modifier.fillMaxWidth()
                     .padding(bottom = 20.dp), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
