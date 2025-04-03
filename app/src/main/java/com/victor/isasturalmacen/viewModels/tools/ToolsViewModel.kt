@@ -2,10 +2,15 @@ package com.victor.isasturalmacen.viewModels.tools
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.os.Bundle
 import android.os.Environment
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.victor.isasturalmacen.MainActivity
@@ -37,7 +42,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ToolFlowViewModel @Inject constructor(private val db: DataBaseService, private val authService: AuthService):ViewModel() {
 
-    
+
     private val _uiState = MutableStateFlow(ToolFlowUiState())
     val uiState : StateFlow<ToolFlowUiState> = _uiState
 
@@ -239,6 +244,19 @@ class ToolFlowViewModel @Inject constructor(private val db: DataBaseService, pri
         }
     }
 
+    @SuppressLint("QueryPermissionsNeeded")
+    fun intentChooser(){
+        val sendIntent = Intent(Intent.ACTION_SEND)
+        val bundle = Bundle()
+        val title: String = "Seleccione un modo"
+// Create intent to show the chooser dialog
+        val chooser: Intent = Intent.createChooser(sendIntent, title)
+
+// Verify the original intent will resolve to at least one activity
+        //if (sendIntent.resolveActivity(packageManager) != null) {
+
+        //}
+    }
 }
 
 data class ToolFlowUiState(

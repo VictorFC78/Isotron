@@ -1,6 +1,7 @@
 package com.victor.isasturalmacen.screens.authentication
 
 import DefaultDialogAlert
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
@@ -23,6 +25,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -39,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -68,7 +72,7 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel(),
 
     val user = ActualUser.getActualUser()
     val uiState by viewModel.uiState.collectAsState()
-
+    val context = LocalContext.current
 
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = user.name!!) }, actions = {
@@ -127,6 +131,20 @@ fun ManageAccountScreen(viewModel: ManageAccountViewModel = hiltViewModel(),
                         }
 
                     }
+                }
+            }
+            Box(modifier = Modifier.fillMaxSize().padding(10.dp), contentAlignment = Alignment.BottomStart){
+                FloatingActionButton(containerColor = Color.LightGray,
+                    onClick = {
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, "")
+                            type = "text/plain"
+                        }
+                        context.startActivity(Intent.createChooser(intent, "Compartir con"))
+                    }, modifier = Modifier.alpha(0.80f)
+                ) {
+                    Icon(Icons.Filled.Add, "Floating action button.")
                 }
             }
             DefaultDialogAlert(show = uiState.showConnectivityOk, dialogTitle = "SIN CONEXION",

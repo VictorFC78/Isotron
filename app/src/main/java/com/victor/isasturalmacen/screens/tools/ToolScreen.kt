@@ -1,6 +1,8 @@
 package com.victor.isasturalmacen.screens.tools
 
 import DefaultDialogAlert
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -49,8 +51,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat.startActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.victor.isasturalmacen.R
+import com.victor.isasturalmacen.auxs.Connectivity
 import com.victor.isasturalmacen.defaultsComponents.ToastDefault
 import com.victor.isasturalmacen.domain.Tool
 import com.victor.isasturalmacen.viewModels.tools.ToolFlowUiState
@@ -58,6 +63,7 @@ import com.victor.isasturalmacen.viewModels.tools.ToolFlowViewModel
 import com.victor.isotronalmacen.components.DefaultBottomBarApp
 import com.victor.isotronalmacen.components.DefaultsTopAppBar
 
+@SuppressLint("QueryPermissionsNeeded")
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +74,7 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
                    navigateToAddTool:()->Unit,
                    navigateToLogout:()->Unit){
 
-
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val actualUser = uiState.userCredentianls.equals("admin")
 
@@ -99,7 +105,14 @@ fun ToolsScreen(viewModel: ToolFlowViewModel = hiltViewModel(),
             }
             Box(modifier = Modifier.fillMaxSize().padding(10.dp), contentAlignment = Alignment.BottomStart){
                 FloatingActionButton(containerColor = Color.LightGray,
-                    onClick = {  }, modifier = Modifier.alpha(0.80f)
+                    onClick = {
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, "")
+                            type = "text/plain"
+                        }
+                        context.startActivity(Intent.createChooser(intent, "Compartir con"))
+                          }, modifier = Modifier.alpha(0.80f)
                 ) {
                     Icon(Icons.Filled.Add, "Floating action button.")
                 }

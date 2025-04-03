@@ -1,6 +1,7 @@
 package com.victor.isasturalmacen.screens.products
 
 import DefaultDialogAlert
+import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -15,15 +16,21 @@ import androidx.compose.foundation.layout.padding
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,7 +55,7 @@ fun WiresScreen(viewModel: WiresViewModel = hiltViewModel(),
                 navigateToLogin:()->Unit){
 
     val uiState by viewModel.uiState.collectAsState()
-
+    val context = LocalContext.current
     Scaffold(topBar = {
        DefaultsTopAppBar(navigateToAddItem = {navigateToAddWire()},
            onClickDownloadItem = {viewModel.showDialogDownloadFiles()},
@@ -74,6 +81,20 @@ fun WiresScreen(viewModel: WiresViewModel = hiltViewModel(),
                            showDeleteDialog = { product->viewModel.showDialogDelete(product)})
                        { id,inOut->viewModel.showAmountInputOutputWire(id,inOut)}
                    }
+                }
+            }
+            Box(modifier = Modifier.fillMaxSize().padding(10.dp), contentAlignment = Alignment.BottomStart){
+                FloatingActionButton(containerColor = Color.LightGray,
+                    onClick = {
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, "")
+                            type = "text/plain"
+                        }
+                        context.startActivity(Intent.createChooser(intent, "Compartir con"))
+                    }, modifier = Modifier.alpha(0.80f)
+                ) {
+                    Icon(Icons.Filled.Add, "Floating action button.")
                 }
             }
                 DialogInputOutputProduct(uiState.showDialogAmount,
